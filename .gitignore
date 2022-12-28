@@ -21,3 +21,5 @@ tests/report/
 # Ignore database and files upload directory
 **schedules/
 *.sqlite3
+
+.vscode/
