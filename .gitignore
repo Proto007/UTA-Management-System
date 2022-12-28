@@ -7,7 +7,6 @@
 *.pot
 *.py[co]
 .tox/
-__pycache__/
 MANIFEST
 dist/
 docs/_build/
@@ -21,3 +20,5 @@ tests/report/
 # Ignore database and files upload directory
 **schedules/
 *.sqlite3
+
+.vscode/
