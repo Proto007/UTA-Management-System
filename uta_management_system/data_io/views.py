@@ -1,5 +1,6 @@
 import pandas as pd
 import datetime
+import hashlib
 from rest_framework import viewsets,status
 from rest_framework.response import Response
 from rest_framework.permissions import  IsAdminUser
@@ -48,7 +49,7 @@ class DataIOViewSet(viewsets.ModelViewSet):
             shift = s.split()
             if shift[0].strip() not in DAYS.keys():
                 break
-            on_shift = df.loc[df[s]==1.0].iloc[:,1].to_list()
+            on_shift = df.loc[df[s] == 1.0].iloc[:,1].to_list()
             day = DAYS[f'{shift[0].strip()}']
             start = datetime.time(int(shift[1][:2]), int(shift[1][3:]), 0)
             end = datetime.time(int(shift[3][:2]), int(shift[3][3:]), 0)
@@ -94,3 +95,17 @@ class UTAViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUser,)
     queryset = UTA.objects.all()
     serializer_class = UTASerializer
+
+class RandomPassViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAdminUser,)
+    queryset = RandomPass.objects.all()
+    http_method_names = ['post']
+    serializer_class = RandomPassSerializer
+
+    def create(self, request=None):
+        serializer = RandomPassSerializer
+        time_str = f"{datetime.datetime.now().date().strftime('%m/%d/%Y')}RyanSadabUmarYoomin"
+        time_str = hashlib.md5(time_str.encode()).hexdigest()
+        RandomPass.objects.all().delete()
+        new_pass = RandomPass.objects.create(random_pass=time_str)
+        return Response(serializer(new_pass).data, status=status.HTTP_201_CREATED)
