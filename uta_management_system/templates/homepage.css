@@ -1,0 +1,30 @@
+#background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background-color: rebeccapurple;
+}
+
+#title {
+    flex: 0 0 120px;
+    position: relative;
+    z-index: 2;
+    padding: 30px;
+    text-align: center;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+#instructions {
+    flex: 0 0 120px;
+    position: relative;
+    z-index: 2;
+    padding: 30px;
+    text-align: center;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    color: white;
+}
