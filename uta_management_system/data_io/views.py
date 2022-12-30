@@ -11,6 +11,7 @@ class DataIOViewSet(viewsets.ModelViewSet):
     """
     Viewset to modify the schedule link and return timesheet
     """
+    permission_classes = (IsAdminUser,)
     queryset = DataIO.objects.all()
     serializer_class = DataIOSerializer
 
