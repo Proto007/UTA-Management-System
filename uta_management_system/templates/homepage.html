@@ -2,7 +2,6 @@
 
 <html lang = "en">
     <div id="background"></div>
-    <div class="focus-element"></div>
     <div class="form-popup" id="myForm">
         <form class = "form-container" onsubmit="return false;">
             <h1>Authenticator</h1>
@@ -13,16 +12,15 @@
         </form>
     </div>
     </div>
-
-    <div class="container" id = "container">
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    </head>
     <head>
         <title>UTA-Clockin</title>
         <link rel = "stylesheet" type = "text/css" href = "homepage.css">
         <script src="homepage.js"></script>
     </head>
-
-
-
+    <div class="container" id = "container">
     <div id = "title">
         <h1>Welcome to the UTA Scheduling System</h1>
     </div>
@@ -32,4 +30,5 @@
         <b>1. Shift supervisor must enter access code <br>2. All UTA's MUST tap their card to get paid<br>3. Camera will log each entry</b>
     </div>
     </div>
+    <input type="text" id="inner-button"/>
 </html>
