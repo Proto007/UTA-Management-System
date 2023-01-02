@@ -98,7 +98,6 @@ class UTAViewSet(viewsets.ModelViewSet):
     serializer_class = UTASerializer
 
 class RandomPassViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAdminUser,)
     queryset = RandomPass.objects.all()
     http_method_names = ['post']
     serializer_class = RandomPassSerializer
@@ -112,7 +111,6 @@ class RandomPassViewSet(viewsets.ModelViewSet):
         return Response(serializer(new_pass).data, status=status.HTTP_201_CREATED)
 
 class CheckinViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAdminUser,)
     queryset = Checkin.objects.all()
     serializer_class = CheckinSerializer
 
