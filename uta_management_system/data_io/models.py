@@ -26,3 +26,9 @@ class UTA(models.Model):
 
 class RandomPass(models.Model): 
     random_pass = models.CharField(max_length=100, default="")
+
+class Checkin(models.Model):
+    emplid = models.CharField(max_length=8, validators=[MinLengthValidator(8)])
+    shift = models.ManyToManyField(Shift)
+    late_mins = models.IntegerField(default=0)
+    number_of_shifts = models.IntegerField(default=1)
