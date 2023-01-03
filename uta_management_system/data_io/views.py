@@ -1,8 +1,9 @@
-import pandas as pd
-import datetime
 import hashlib
+import pandas as pd
+from datetime import datetime, time
 from rest_framework import viewsets,status
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework.permissions import  IsAdminUser
 from .models import *
 from .serializers import *
@@ -51,8 +52,8 @@ class DataIOViewSet(viewsets.ModelViewSet):
                 break
             on_shift = df.loc[df[s] == 1.0].iloc[:,1].to_list()
             day = DAYS[f'{shift[0].strip()}']
-            start = datetime.time(int(shift[1][:2]), int(shift[1][3:]), 0)
-            end = datetime.time(int(shift[3][:2]), int(shift[3][3:]), 0)
+            start = time(int(shift[1][:2]), int(shift[1][3:]), 0)
+            end = time(int(shift[3][:2]), int(shift[3][3:]), 0)
             try:
                 new_shift = Shift.objects.get(description=s.strip(), day=day, start=start, end=end)
             except Shift.DoesNotExist:
@@ -75,7 +76,7 @@ class DataIOViewSet(viewsets.ModelViewSet):
         UTA.objects.all().delete()
         success = self.get_schedules(new_link['file_link'])
         if not success:
-            return Response(status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response({"Failure":"unable to parse csv file in given link"}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         new_entry = DataIO.objects.create(file_link=new_link['file_link'])
         new_entry.save()
         return Response(status=status.HTTP_201_CREATED)
@@ -97,15 +98,96 @@ class UTAViewSet(viewsets.ModelViewSet):
     serializer_class = UTASerializer
 
 class RandomPassViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAdminUser,)
     queryset = RandomPass.objects.all()
     http_method_names = ['post']
     serializer_class = RandomPassSerializer
 
     def create(self, request=None):
         serializer = RandomPassSerializer
-        time_str = f"{datetime.datetime.now().date().strftime('%m/%d/%Y')}RyanSadabUmarYoomin"
+        time_str = f"{datetime.now().date().strftime('%m/%d/%Y')}RyanSadabUmarYoomin"
         time_str = hashlib.md5(time_str.encode()).hexdigest()
         RandomPass.objects.all().delete()
         new_pass = RandomPass.objects.create(random_pass=time_str)
         return Response(serializer(new_pass).data, status=status.HTTP_201_CREATED)
+
+class CheckinViewSet(viewsets.ModelViewSet):
+    queryset = Checkin.objects.all()
+    serializer_class = CheckinSerializer
+
+    @action(detail=False, methods=['get'], url_path='has_next_shift')
+    def has_next_shift(self, request=None,*args, **kwargs):
+        shift = self.get_current_shift()
+        if shift and self.get_next_shift(shift, 2):
+            return Response({"has_next_shift":True}, status=status.HTTP_200_OK)
+        return Response({"has_next_shift":False}, status=status.HTTP_200_OK)
+
+    def get_next_shift(self, shift:Shift, num:int):
+        now = datetime.now().time()
+        day = now.strftime('%A')
+        
+        if num-1<=0:
+            return []
+        
+        shifts = list(Shift.objects.filter(day=(day,)))
+        shifts.sort(key=lambda x: x.start)
+        if not shifts:
+            return []
+        
+        index = shifts.index(shift)
+        result = []
+        for i in range(num):
+            if index+i > len(shifts)-1:
+                return result
+            result.append(shifts[index+i])
+        return result
+
+    def get_current_shift(self, day=None):
+        now = datetime.now().time()
+        if not day:
+            day = datetime.now().strftime('%A')
+        current_shift = None
+        late = 0
+        for shift in Shift.objects.filter(day=day):
+            if shift.start < now < shift.end:
+                current_shift = shift
+                late = int((datetime.combine(datetime.today(), now) - datetime.combine(datetime.today(), shift.start)).total_seconds())//60
+        return (current_shift, late)
+
+    def create(self, request):
+        serializer = CheckinSerializer
+        # check if UTA exists on database
+        empl = request.data['emplid']
+        try:
+            uta = UTA.objects.get(emplid=empl)
+        except UTA.DoesNotExist:
+            return Response({"Failure":"you're not a UTA"}, status=status.HTTP_404_NOT_FOUND)
+
+        # get the shift in current time
+        shift = self.get_current_shift(request.data['alternate_day'])
+        num_of_shifts = request.data['number_of_shifts'] if request.data['number_of_shifts'] else 1
+        next_shifts = self.get_next_shift(shift, int(num_of_shifts))
+
+         #  check if UTA is on shift
+        if shift[0] not in list(uta.shifts.all()):
+            return Response({"Failure":"covering another UTA?"}, status=status.HTTP_403_FORBIDDEN)
+
+        if not shift[0]:
+            return Response({"Failure":"no shift at current time"}, status=status.HTTP_403_FORBIDDEN)
+
+        if shift[1] > ((datetime.combine(datetime.today(), shift[0].end)-datetime.combine(datetime.today(),shift[0].start)).total_seconds()//180):
+            return Response({"Failure":"you're extremely late to your shift"}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            new_checkin = Checkin.objects.get(emplid=empl, shift=shift[0])
+        except Checkin.DoesNotExist:
+            new_checkin = Checkin.objects.create(emplid=empl, shift=shift[0], late_mins=shift[1])
+            new_checkin.save()
+
+        for s in next_shifts:
+            try:
+                next_shift_checkin = Checkin.objects.get(emplid=empl, shift=s)
+            except Checkin.DoesNotExist:
+                next_shift_checkin = Checkin.objects.create(emplid=empl, shift=s)
+                next_shift_checkin.save()
+
+        return Response(serializer(new_checkin).data, status=status.HTTP_200_OK)

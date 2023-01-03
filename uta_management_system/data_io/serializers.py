@@ -24,3 +24,12 @@ class RandomPassSerializer(serializers.ModelSerializer):
         model = RandomPass
         fields = ['random_pass']
         read_only_fields = ['random_pass']
+
+class CheckinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Checkin
+        fields = ['emplid', 'shift', 'late_mins', 'number_of_shifts', 'alternate_day']
+        read_only_fields = ['shift', 'late_mins']
+        extra_kwargs = {
+            'alternate_day': {'write_only': True}
+        }
