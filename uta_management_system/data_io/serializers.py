@@ -28,5 +28,8 @@ class RandomPassSerializer(serializers.ModelSerializer):
 class CheckinSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkin
-        fields = ['emplid', 'shift', 'late_mins', 'number_of_shifts']
+        fields = ['emplid', 'shift', 'late_mins', 'number_of_shifts', 'alternate_day']
         read_only_fields = ['shift', 'late_mins']
+        extra_kwargs = {
+            'alternate_day': {'write_only': True}
+        }

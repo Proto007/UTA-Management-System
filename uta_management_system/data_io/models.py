@@ -28,7 +28,16 @@ class RandomPass(models.Model):
     random_pass = models.CharField(max_length=100, default="")
 
 class Checkin(models.Model):
+    DAYS = (
+        ("", 'Not an alternate schedule'),
+        ('Monday', 'Monday schedule'),
+        ('Tuesday', 'Tuesday schedule'),
+        ('Wednesday', 'Wednesday schedule'),
+        ('Thursday', 'Thursday schedule'),
+        ('Friday', 'Friday schedule')
+    )
     emplid = models.CharField(max_length=8, validators=[MinLengthValidator(8)])
-    shift = models.ManyToManyField(Shift)
+    shift = models.ForeignKey(Shift, on_delete=models.CASCADE)
     late_mins = models.IntegerField(default=0)
     number_of_shifts = models.IntegerField(default=1)
+    alternate_day = models.CharField(max_length=10, choices=DAYS, default="")
