@@ -19,15 +19,54 @@
     color: white;
 }
 
-#inner-button {
+
+* {
+    box-sizing: border-box;
+}
+
+.body {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+    color: #333;
+}
+
+.form {
     position: fixed;
-    bottom: 44%;
-    right: 34%;
-    border-radius: 25px;
-    border: 2px solid #609;
-    padding: 20px;
-    width: 30%;
-    height: 15px;
+    display: block;
+    bottom: 45%;
+    right: 42%;
+}
+
+.email-form {
+    display: block;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+
+.button {
+    height: 40px;
+    display: inline-block;
+    padding: 9px 15px;
+    background-color: rebeccapurple;
+    color: white;
+    border: 0;
+    line-height: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.input {
+    display: inline-block;
+    width: 200px;
+    height: 40px;
+    margin-bottom: 0px;
+    padding: 9px 12px;
+    color: #333333;
+    vertical-align: middle;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    line-height: 1.42857143;
 }
 
 #instructions {
@@ -44,21 +83,8 @@
 body {font-family: Arial, Helvetica, sans-serif;}
 * {box-sizing: border-box;}
 
-/* Button used to open the contact form - fixed at the bottom of the page */
-.open-button {
-    background-color: #555;
-    color: white;
-    padding: 16px 20px;
-    border: none;
-    cursor: pointer;
-    opacity: 0.8;
-    position: fixed;
-    bottom: 23px;
-    right: 28px;
-    width: 280px;
-}
 
-/* The popup form  */
+/* The authenticator form  */
 .form-popup {
     display: block;
     position: absolute;
@@ -103,7 +129,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 }
 
 /* Add some hover effects to buttons */
-.form-container .btn:hover, .open-button:hover {
+.form-container .btn:hover {
     opacity: 1;
 }
 
@@ -112,7 +138,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
     height: 100%;
     min-height: 400px;
     position: relative;
-    filter: blur(5.0rem);
+    filter: blur(100rem);
     z-index: 1;
 }
 
