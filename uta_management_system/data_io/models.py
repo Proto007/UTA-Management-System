@@ -2,15 +2,9 @@ from django.db import models
 from django.core.validators import MinLengthValidator
 
 class DataIO(models.Model):
-    """
-    A django model to represent a file containing UTA schedules.
-    """
     file_link = models.URLField(max_length=200, default="")
 
 class Shift(models.Model):
-    """
-    A django model to represent a single UTA shift.
-    """
     DAYS = (
         ('Monday', 'Shift is on Mondays'),
         ('Tuesday', 'Shift is on Tuesdays'),
@@ -29,3 +23,21 @@ class UTA(models.Model):
     firstname = models.CharField(max_length=100, default="")
     emplid = models.CharField(max_length=8, validators=[MinLengthValidator(8)])
     shifts = models.ManyToManyField(Shift)
+
+class RandomPass(models.Model): 
+    random_pass = models.CharField(max_length=100, default="")
+
+class Checkin(models.Model):
+    DAYS = (
+        ("", 'Not an alternate schedule'),
+        ('Monday', 'Monday schedule'),
+        ('Tuesday', 'Tuesday schedule'),
+        ('Wednesday', 'Wednesday schedule'),
+        ('Thursday', 'Thursday schedule'),
+        ('Friday', 'Friday schedule')
+    )
+    emplid = models.CharField(max_length=8, validators=[MinLengthValidator(8)])
+    shift = models.ForeignKey(Shift, on_delete=models.CASCADE)
+    late_mins = models.IntegerField(default=0)
+    number_of_shifts = models.IntegerField(default=1)
+    alternate_day = models.CharField(max_length=10, choices=DAYS, default="")
