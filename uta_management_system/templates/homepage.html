@@ -1,10 +1,30 @@
 <!DOCTYPE html>
 
-<html>
+<html lang = "en">
+    <div id="background"></div>
+    <div class="form-popup" id="myForm">
+        <form class = "form-container" onsubmit="return false;">
+            <h1>Authenticator</h1>
+            <label for="psw"><b>Access Code</b></label>
+            <input type="password" placeholder="Enter Password" name="psw" required>
+
+            <button type="submit" class="btn" onclick="closeForm()">Login</button>
+        </form>
+    </div>
+    </div>
     <head>
-        <title>UTA Management System</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     </head>
-    <body>
-        Welcome to the UTA Management System. Ask supervisor/Professor/admin for today's link.
-    </body>
+    <head>
+        <title>UTA-Clockin</title>
+        <link rel = "stylesheet" type = "text/css" href = "homepage.css">
+        <script src="homepage.js"></script>
+    </head>
+    
+    <div class="container" id = "container">
+    <div id = "title"><h1>Welcome to the UTA Scheduling System</h1></div>
+        <div class="form">
+            <form class="email-form"><input type="text" class="input"><a href="#" class="button">Submit</a></form>
+        </div>
+    </div>
 </html>
