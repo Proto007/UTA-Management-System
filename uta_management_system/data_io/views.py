@@ -105,7 +105,7 @@ class RandomPassViewSet(viewsets.ModelViewSet):
     def create(self, request=None):
         serializer = RandomPassSerializer
         time_str = f"{datetime.now().date().strftime('%m/%d/%Y')}RyanSadabUmarYoomin"
-        time_str = hashlib.md5(time_str.encode()).hexdigest()
+        time_str = hashlib.md5(time_str.encode()).hexdigest()[:8]
         RandomPass.objects.all().delete()
         new_pass = RandomPass.objects.create(random_pass=time_str)
         return Response(serializer(new_pass).data, status=status.HTTP_201_CREATED)
