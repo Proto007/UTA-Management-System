@@ -2,10 +2,10 @@
 Webapp that will allow Hunter CS Department to track clock-in and clock-out for UTAs.
 
 ## Project Setup ##
-1. Set up a virtual environment for django
+1. Set up a virtual environment for Django
 ```
-pip install virtualenv
-virtualenv venv
+py -m pip install --user virtualenv
+py -m virtualenv venv
 ```
 Windows:
 ```
