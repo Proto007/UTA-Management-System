@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+{% load rest_framework %}
+<html>
+    <head>
+        <title>Admin</title>
+    </head>
+    <body>
+        The random link for today is: {{ random_pass }}
+    </body>
+    <form method="POST">
+        {% csrf_token %}
+        <input type='url' name='file_link'>
+        <button type='submit'>Update Schedule</button>
+        <div>
+            {% if updated != None and updated == False %}
+                <body>Failed to update schedule. Make sure the link is valid and csv is formatted appropriately</body>
+            {% elif updated == True %}
+                <body>Schedules updated successfully!</body>
+            {% endif %}
+        </div>
+    </form>
+</html>
