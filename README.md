@@ -2,21 +2,7 @@
 Webapp that will allow Hunter CS Department to track clock-in and clock-out for UTAs.
 
 ## Project Setup ##
-1. Set up a virtual environment for Django
-```
-py -m pip install --user virtualenv
-py -m virtualenv venv
-```
-Windows:
-```
-cd venv
-cd Scripts
-activate
-```
-Linux/Mac:
-```
-source venv/bin/activate
-```
+1. Set up a virtual environment for Django. Virtualenv docs: https://virtualenv.pypa.io/en/latest/installation.html
 2. Clone this repository using `git clone https://github.com/Proto007/UTA-Management-System`
 3. Install the libraries from requirements.txt
 ```
