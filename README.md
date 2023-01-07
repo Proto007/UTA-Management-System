@@ -22,5 +22,3 @@ Branch names should be names as follows:
 1. Branches should be named with initials of the person creating the branch. 
 2. The initials would be followed by a '/' and name of the branch. 
 3. The name of the branch should briefly describe what the branch is for.
-
-
