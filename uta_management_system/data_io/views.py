@@ -13,7 +13,6 @@ class DataIOViewSet(viewsets.ModelViewSet):
     """
     Viewset to modify the schedule link and return timesheet
     """
-    permission_classes = (IsAdminUser,)
     queryset = DataIO.objects.all()
     serializer_class = DataIOSerializer
 
@@ -105,7 +104,11 @@ class RandomPassViewSet(viewsets.ModelViewSet):
     def create(self, request=None):
         serializer = RandomPassSerializer
         time_str = f"{datetime.now().date().strftime('%m/%d/%Y')}RyanSadabUmarYoomin"
-        time_str = hashlib.md5(time_str.encode()).hexdigest()[:8]
+        time_str = hashlib.md5(time_str.encode()).hexdigest()[:10]
+        add_cases = ""
+        for i in range(len(time_str)):
+            add_cases += time_str[i].upper() if (time_str[i].isalpha() and i%2 == 0) else time_str[i]
+        time_str = add_cases
         RandomPass.objects.all().delete()
         new_pass = RandomPass.objects.create(random_pass=time_str)
         return Response(serializer(new_pass).data, status=status.HTTP_201_CREATED)
