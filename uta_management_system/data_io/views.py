@@ -79,12 +79,14 @@ class DataIOViewSet(viewsets.ModelViewSet):
         """
         Add or update the link to UTA schedule
         """
+        old_link = DataIO.objects.all()[0].file_link if DataIO.objects.all() else ""
         new_link = request.data
         DataIO.objects.all().delete()
         Shift.objects.all().delete()
         UTA.objects.all().delete()
         success = self.get_schedules(new_link["file_link"])
         if not success:
+            DataIO.objects.create(file_link=old_link)
             return Response(
                 {"Failure": "unable to parse csv file in given link"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -205,16 +207,16 @@ class CheckinViewSet(viewsets.ModelViewSet):
         )
         next_shifts = self.get_next_shift(shift, int(num_of_shifts))
 
-        #  check if UTA is on shift
-        if shift[0] not in list(uta.shifts.all()):
-            return Response(
-                {"Failure": "covering another UTA?"}, status=status.HTTP_403_FORBIDDEN
-            )
-
         if not shift[0]:
             return Response(
                 {"Failure": "no shift at current time"},
                 status=status.HTTP_403_FORBIDDEN,
+            )
+
+        #  check if UTA is on shift
+        if shift[0] not in list(uta.shifts.all()):
+            return Response(
+                {"Failure": "covering another UTA?"}, status=status.HTTP_403_FORBIDDEN
             )
 
         if shift[1] > (
