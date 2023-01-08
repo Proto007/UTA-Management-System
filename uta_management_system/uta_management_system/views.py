@@ -37,15 +37,16 @@ class AdminActions(APIView):
         random_pass = requests.post(
             request.build_absolute_uri(reverse("dataio:random_pass-list")), json={}
         ).json()["random_pass"]
+
         response = requests.post(
             request.build_absolute_uri(reverse("dataio:update_schedule-list")),
             json={"file_link": request.data["file_link"]},
         )
+    
         success = False
         if response.status_code == 201:
             success = True
-        else:
-            print(response, response.status_code)
+
         return render(
             request,
             "admin_actions.html",
