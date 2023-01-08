@@ -3,20 +3,24 @@
 <html>
     <head>
         <title>Admin</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/adminpage.css' %}">
     </head>
-    <body>
-        The random link for today is: {{ random_pass }}
-    </body>
-    <form method="POST">
-        {% csrf_token %}
-        <input type='url' name='file_link'>
-        <button type='submit'>Update Schedule</button>
-        <div>
-            {% if updated != None and updated == False %}
-                <body>Failed to update schedule. Make sure the link is valid and csv is formatted appropriately</body>
-            {% elif updated == True %}
-                <body>Schedules updated successfully!</body>
-            {% endif %}
-        </div>
-    </form>
+    <div class="content">
+        <body>
+            The random link for today is: {{ random_pass }}
+        </body>
+        <form method="POST">
+            {% csrf_token %}
+            <input type='url' name='file_link'>
+            <button type='submit'>Update Schedule</button>
+            <div>
+                {% if updated != None and updated == False %}
+                    <body>Failed to update schedule. Make sure the link is valid and csv is formatted appropriately</body>
+                {% elif updated == True %}
+                    <body>Schedules updated successfully!</body>
+                {% endif %}
+            </div>
+        </form>
+    </div>
 </html>
