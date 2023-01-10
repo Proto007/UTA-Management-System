@@ -42,7 +42,7 @@ class AdminActions(APIView):
             request.build_absolute_uri(reverse("dataio:update_schedule-list")),
             json={"file_link": request.data["file_link"]},
         )
-    
+
         success = False
         if response.status_code == 201:
             success = True
