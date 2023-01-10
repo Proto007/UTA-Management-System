@@ -24,3 +24,5 @@ tests/report/
 
 .vscode/
 .DS_Store
+/uta_management_system/env/
+/.idea/
