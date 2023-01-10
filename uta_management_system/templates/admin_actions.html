@@ -16,9 +16,9 @@
             <button type='submit'>Update Schedule</button>
             <div>
                 {% if updated != None and updated == False %}
-                    <body>Failed to update schedule. Make sure the link is valid and csv is formatted appropriately</body>
+                    <p class="fail">Failed to update schedule. Make sure the link is valid and csv is formatted appropriately.</p>
                 {% elif updated == True %}
-                    <body>Schedules updated successfully!</body>
+                    <p class="success">Schedules updated successfully!</p>
                 {% endif %}
             </div>
         </form>
