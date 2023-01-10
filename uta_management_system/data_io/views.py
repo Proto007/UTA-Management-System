@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from .models import *
 from .serializers import *
 
-adadadada
+
 # Create your views here.
 class DataIOViewSet(viewsets.ModelViewSet):
     """

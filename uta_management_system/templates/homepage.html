@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-
+{% load rest_framework %}
 <html>
     <head>
         <title>UTA Management System</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static "css/homepage.css" %}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script src="{% static "script/homepage.js" %}"></script>
     </head>
     <body>
         <div class = "log-in-container">
             <div class = "log-in">
-                <div class = "log-in-logo">
+                <div class = "image">
                     {% load static %}
                     <img src = "{% static "media/logo_nobg.png" %}" alt = "logo">
                 </div>
-                <div class = "log-in-header"></div>
+                <div class = "text"></div>
                     <h1>Welcome to the UTA Management System!</h1>
-                    <div>Please ask supervisor/ professor/ admin for today's link. </div>
+                    <div>Please ask the supervisor/professor/admin for today's link.</div>
                     </div>
-                </form>
             </div>
-        </div>
     </body>
 </html>
