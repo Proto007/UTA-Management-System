@@ -5,6 +5,8 @@
         <title>Admin</title>
         {% load static %}
         <link rel="stylesheet" href="{% static 'css/adminpage.css' %}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script src="{% static "script/script.js" %}"></script>
     </head>
     <div class="content">
         <body>
@@ -15,10 +17,10 @@
             <input type='url' name='file_link'>
             <button type='submit'>Update Schedule</button>
             <div class="timeout">
-                {% if updated != None and updated == False %}
-                    <p class="fail">Failed to update schedule. Make sure the link is valid and csv is formatted appropriately.</p>
-                {% elif updated == True %}
-                    <p class="success">Schedules updated successfully!</p>
+                {% if messages %}
+                    {% for message in messages %}
+                        <p {% if message.tags %} class="{{message.tags}}-msg" {% endif %}>{{message}}</p>
+                    {% endfor %}
                 {% endif %}
             </div>
         </form>

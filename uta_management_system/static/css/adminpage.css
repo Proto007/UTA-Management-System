@@ -7,13 +7,13 @@ body {
     background-color:black;
 }
 
-.success{
+.success-msg {
     color:greenyellow;
     margin:0;
     padding:0;
 }
 
-.fail{
+.error-msg {
     color:red;
     margin:0;
     padding:0;
