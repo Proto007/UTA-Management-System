@@ -1,15 +1,36 @@
 <!DOCTYPE html>
-
-<html lang = "en">
+{% load rest_framework %}
+<html>
     <head>
-        <title>UTA-Clockin</title>
-        <link rel = "stylesheet" type = "text/css" href = "homepage.css">
+        <title>UTA-checkin</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/checkin.css' %}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script src="{% static "script/script.js" %}"></script>
     </head>
-    
-    <div class="container" id = "container">
-    <div id = "title"><h1>Welcome to the UTA Scheduling System</h1></div>
-        <div class="form">
-            <form class="email-form"><input type="text" class="input"><a href="#" class="button">Submit</a></form>
-        </div>
+    <div class="content">
+        <form method="POST">
+            {% csrf_token %}
+            <input type='number' minlength="8" maxlength="8" placeholder="UTA Emplid (e.g.11111111)" name='emplid'><br>
+            <input type="number" value="0" placeholder="Additional shifts after current shift" name="number_of_shifts"><br>
+            <label><input type="checkbox" class="alternate-toggle">CUNY Alternate Day</label>
+            <select name="alternate_day" class="alternate-day-selector">
+                <option value="">Select Alternate Day</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+            </select>
+            <br>
+            <div class="timeout">
+                {% if checked_in != None and checked_in == False %}
+                    <p class="fail"> fail: {{message}} </p>
+                {% elif checked_in == True %}
+                    <p class="success"> success: {{message}} </p>
+                {% endif %}
+            </div>
+            <button type='submit'>Checkin</button>
+        </form>
     </div>
 </html>
