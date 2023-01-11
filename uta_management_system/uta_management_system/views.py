@@ -11,8 +11,9 @@ def homepage(request):
     """
     return render(request, "homepage.html")
 
+
 class Checkin(APIView):
-    extra_fields = ('alternate-toggle',)
+    extra_fields = ("alternate-toggle",)
     renderer_classes = [TemplateHTMLRenderer]
     template_name = "checkin.html"
 
@@ -20,7 +21,7 @@ class Checkin(APIView):
         new_pass = requests.post(
             request.build_absolute_uri(reverse("dataio:random_pass-list")), json={}
         ).json()["random_pass"]
-        if  random_pass == new_pass:
+        if random_pass == new_pass:
             return render(request, "checkin.html")
         return render(request, "homepage.html")
 
@@ -28,26 +29,29 @@ class Checkin(APIView):
         new_pass = requests.post(
             request.build_absolute_uri(reverse("dataio:random_pass-list")), json={}
         ).json()["random_pass"]
-        if  random_pass != new_pass:
+        if random_pass != new_pass:
             return render(request, "homepage.html")
 
         response = requests.post(
-            request.build_absolute_uri(reverse("dataio:checkin-list")), json={
+            request.build_absolute_uri(reverse("dataio:checkin-list")),
+            json={
                 "emplid": request.data["emplid"],
                 "number_of_shifts": request.data["number_of_shifts"],
-                "alternate_day": request.data["alternate_day"]
-            }
+                "alternate_day": request.data["alternate_day"],
+            },
         )
         success = False
         message = ""
         if response.status_code == 201:
             success = True
-            message = response.json()['message']
+            message = response.json()["message"]
         else:
             success = False
-            message= response.json()['failure']
+            message = response.json()["failure"]
 
-        return render(request, "checkin.html", {"checked_in":success, "message":message})
+        return render(
+            request, "checkin.html", {"checked_in": success, "message": message}
+        )
 
 
 class AdminActions(APIView):

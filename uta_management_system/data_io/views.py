@@ -242,4 +242,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
                 next_shift_checkin.save()
                 count += 1
 
-        return Response({"message":f'Checked in successfully for {count} shifts'}, status=status.HTTP_200_OK)
+        return Response(
+            {"message": f"Checked in successfully for {count} shifts"},
+            status=status.HTTP_200_OK,
+        )
