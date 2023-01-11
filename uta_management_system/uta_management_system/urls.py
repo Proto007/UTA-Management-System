@@ -27,5 +27,5 @@ urlpatterns = [
     ),
     path("admin/", admin.site.urls),
     path("api/", include("data_io.urls")),
-    path("<str:random_pass>/", views.checkin),
+    path("<str:random_pass>/", views.Checkin.as_view(), name="checkin"),
 ]
