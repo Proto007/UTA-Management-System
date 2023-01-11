@@ -87,6 +87,7 @@ class DataIOViewSet(viewsets.ModelViewSet):
         success = self.get_schedules(new_link["file_link"])
         if not success:
             DataIO.objects.create(file_link=old_link)
+            self.get_schedules(old_link)
             return Response(
                 {"Failure": "unable to parse csv file in given link"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -201,7 +202,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
 
         if not shift[0]:
             return Response(
-                {"failure": "no shift at current time"},
+                {"failure": "No shift at current time"},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
