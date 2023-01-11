@@ -14,7 +14,7 @@
             {% csrf_token %}
             <input type='url' name='file_link'>
             <button type='submit'>Update Schedule</button>
-            <div>
+            <div class="timeout">
                 {% if updated != None and updated == False %}
                     <p class="fail">Failed to update schedule. Make sure the link is valid and csv is formatted appropriately.</p>
                 {% elif updated == True %}

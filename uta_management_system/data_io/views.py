@@ -142,13 +142,6 @@ class CheckinViewSet(viewsets.ModelViewSet):
     queryset = Checkin.objects.all()
     serializer_class = CheckinSerializer
 
-    @action(detail=False, methods=["get"], url_path="has_next_shift")
-    def has_next_shift(self, request=None, *args, **kwargs):
-        shift = self.get_current_shift()
-        if shift and self.get_next_shift(shift, 2):
-            return Response({"has_next_shift": True}, status=status.HTTP_200_OK)
-        return Response({"has_next_shift": False}, status=status.HTTP_200_OK)
-
     def get_next_shift(self, shift: Shift, num: int):
         now = datetime.now().time()
         day = now.strftime("%A")
@@ -190,14 +183,13 @@ class CheckinViewSet(viewsets.ModelViewSet):
         return (current_shift, late)
 
     def create(self, request):
-        serializer = CheckinSerializer
         # check if UTA exists on database
         empl = request.data["emplid"]
         try:
             uta = UTA.objects.get(emplid=empl)
         except UTA.DoesNotExist:
             return Response(
-                {"Failure": "you're not a UTA"}, status=status.HTTP_404_NOT_FOUND
+                {"failure": "you're not a UTA"}, status=status.HTTP_404_NOT_FOUND
             )
 
         # get the shift in current time
@@ -209,14 +201,14 @@ class CheckinViewSet(viewsets.ModelViewSet):
 
         if not shift[0]:
             return Response(
-                {"Failure": "no shift at current time"},
+                {"failure": "no shift at current time"},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         #  check if UTA is on shift
         if shift[0] not in list(uta.shifts.all()):
             return Response(
-                {"Failure": "covering another UTA?"}, status=status.HTTP_403_FORBIDDEN
+                {"failure": "Covering another UTA?"}, status=status.HTTP_403_FORBIDDEN
             )
 
         if shift[1] > (
@@ -227,7 +219,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
             // 180
         ):
             return Response(
-                {"Failure": "you're extremely late to your shift"},
+                {"failure": "You're extremely late to your shift"},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -238,12 +230,19 @@ class CheckinViewSet(viewsets.ModelViewSet):
                 emplid=empl, shift=shift[0], late_mins=shift[1]
             )
             new_checkin.save()
-
+        count = 1
         for s in next_shifts:
             try:
                 next_shift_checkin = Checkin.objects.get(emplid=empl, shift=s)
             except Checkin.DoesNotExist:
+                #  check if UTA is on shift
+                if s not in list(uta.shifts.all()):
+                    break
                 next_shift_checkin = Checkin.objects.create(emplid=empl, shift=s)
                 next_shift_checkin.save()
+                count += 1
 
-        return Response(serializer(new_checkin).data, status=status.HTTP_200_OK)
+        return Response(
+            {"message": f"Checked in successfully for {count} shifts"},
+            status=status.HTTP_200_OK,
+        )
