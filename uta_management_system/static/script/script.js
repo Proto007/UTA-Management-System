@@ -1,14 +1,12 @@
 $(document).ready(function(){
     $(".alternate-day-selector").hide()
-    hidden = true
     $(".alternate-toggle").on('click', function(){
-        if (hidden == true){
+        if ($(this).prop("checked") === true){
             $(".alternate-day-selector").show()
-            hidden = false
         }
         else{
             $(".alternate-day-selector").hide()
-            hidden = true
+            $(".alternate-day-selector").prop('selectedIndex', 0);
         }
     })
     setTimeout(function() {
