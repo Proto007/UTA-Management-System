@@ -32,15 +32,15 @@ class DataIOViewSet(viewsets.ModelViewSet):
         except Exception:
             return False
         # Add UTAs to database
-        uta_names = [name.split() for name in df.iloc[:, 0].to_list()]
+        uta_names = df.iloc[:, 0].to_list()
         emplid = df.iloc[:, 1].to_list()
         uta_dict = {emplid[i]: uta_names[i] for i in range(len(emplid))}
         for empl, name in uta_dict.items():
             try:
-                UTA.objects.get(lastname=name[1], firstname=name[0], emplid=empl)
+                UTA.objects.get(fullname=name, emplid=empl)
             except UTA.DoesNotExist:
                 new_uta = UTA.objects.create(
-                    lastname=name[1], firstname=name[0], emplid=empl
+                    fullname=name, emplid=empl
                 )
                 new_uta.save()
         # Add shifts to database

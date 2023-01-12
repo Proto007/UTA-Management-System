@@ -20,7 +20,7 @@ class ShiftSerializer(serializers.ModelSerializer):
 class UTASerializer(serializers.ModelSerializer):
     class Meta:
         model = UTA
-        fields = ("lastname", "firstname", "emplid", "shifts")
+        fields = ("fullname", "emplid", "shifts")
         lookup_field = "emplid"
 
 

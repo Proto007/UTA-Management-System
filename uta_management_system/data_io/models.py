@@ -22,8 +22,7 @@ class Shift(models.Model):
 
 
 class UTA(models.Model):
-    lastname = models.CharField(max_length=100, default="")
-    firstname = models.CharField(max_length=100, default="")
+    fullname = models.CharField(max_length=100, default="")
     emplid = models.CharField(max_length=8, validators=[MinLengthValidator(8)])
     shifts = models.ManyToManyField(Shift)
 
