@@ -3,7 +3,6 @@ from datetime import datetime, time
 
 import pandas as pd
 from rest_framework import status, viewsets
-from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
@@ -39,9 +38,7 @@ class DataIOViewSet(viewsets.ModelViewSet):
             try:
                 UTA.objects.get(fullname=name, emplid=empl)
             except UTA.DoesNotExist:
-                new_uta = UTA.objects.create(
-                    fullname=name, emplid=empl
-                )
+                new_uta = UTA.objects.create(fullname=name, emplid=empl)
                 new_uta.save()
         # Add shifts to database
         DAYS = {
@@ -184,7 +181,6 @@ class CheckinViewSet(viewsets.ModelViewSet):
         return (current_shift, late)
 
     def create(self, request):
-        # check if UTA exists on database
         empl = request.data["emplid"]
         try:
             uta = UTA.objects.get(emplid=empl)
@@ -193,7 +189,6 @@ class CheckinViewSet(viewsets.ModelViewSet):
                 {"failure": "you're not a UTA"}, status=status.HTTP_404_NOT_FOUND
             )
 
-        # get the shift in current time
         shift = self.get_current_shift(request.data["alternate_day"])
         num_of_shifts = (
             request.data["number_of_shifts"] if request.data["number_of_shifts"] else 1
@@ -204,12 +199,6 @@ class CheckinViewSet(viewsets.ModelViewSet):
             return Response(
                 {"failure": "No shift at current time"},
                 status=status.HTTP_403_FORBIDDEN,
-            )
-
-        #  check if UTA is on shift
-        if shift[0] not in list(uta.shifts.all()):
-            return Response(
-                {"failure": "Covering another UTA?"}, status=status.HTTP_403_FORBIDDEN
             )
 
         if shift[1] > (
@@ -224,26 +213,42 @@ class CheckinViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
+        covered_by = request.data.get("covered_by", "")
+        if shift[0] not in list(uta.shifts.all()) and not covered_by:
+            on_shift = ",".join(
+                [
+                    uta.fullname
+                    for uta in (list(UTA.objects.filter(shifts__id=shift[0].pk)))
+                ]
+            )
+            return Response({"on_shift": on_shift}, status=status.HTTP_303_SEE_OTHER)
+
         try:
-            new_checkin = Checkin.objects.get(emplid=empl, shift=shift[0])
+            new_checkin = Checkin.objects.get(
+                emplid=empl, shift=shift[0], covered_by=covered_by
+            )
         except Checkin.DoesNotExist:
             new_checkin = Checkin.objects.create(
-                emplid=empl, shift=shift[0], late_mins=shift[1]
+                emplid=empl, shift=shift[0], late_mins=shift[1], covered_by=covered_by
             )
             new_checkin.save()
         count = 1
         for s in next_shifts:
             try:
-                next_shift_checkin = Checkin.objects.get(emplid=empl, shift=s)
+                next_shift_checkin = Checkin.objects.get(
+                    emplid=empl, shift=s, covered_by=covered_by
+                )
             except Checkin.DoesNotExist:
                 #  check if UTA is on shift
                 if s not in list(uta.shifts.all()):
                     break
-                next_shift_checkin = Checkin.objects.create(emplid=empl, shift=s)
+                next_shift_checkin = Checkin.objects.create(
+                    emplid=empl, shift=s, covered_by=covered_by
+                )
                 next_shift_checkin.save()
                 count += 1
 
         return Response(
-            {"message": f"Checked in successfully for {count} shifts"},
-            status=status.HTTP_200_OK,
+            {"message": f"Checked in successfully for {count} shift(s)"},
+            status=status.HTTP_201_CREATED,
         )
