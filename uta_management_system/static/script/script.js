@@ -13,7 +13,7 @@ $(document).ready(function(){
     })
     setTimeout(function() {
         $(".timeout").fadeOut('fast');
-    }, 3000);
+    }, 3500);
 })
 
 $(document).bind("contextmenu",function(e) {
