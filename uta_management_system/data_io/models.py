@@ -22,8 +22,7 @@ class Shift(models.Model):
 
 
 class UTA(models.Model):
-    lastname = models.CharField(max_length=100, default="")
-    firstname = models.CharField(max_length=100, default="")
+    fullname = models.CharField(max_length=100, default="")
     emplid = models.CharField(max_length=8, validators=[MinLengthValidator(8)])
     shifts = models.ManyToManyField(Shift)
 
@@ -45,4 +44,7 @@ class Checkin(models.Model):
     shift = models.ForeignKey(Shift, on_delete=models.CASCADE)
     late_mins = models.IntegerField(default=0)
     number_of_shifts = models.IntegerField(default=1)
+    covered_by = models.CharField(
+        max_length=8, blank=True, null=True, validators=[MinLengthValidator(8)]
+    )
     alternate_day = models.CharField(max_length=10, choices=DAYS, default="")

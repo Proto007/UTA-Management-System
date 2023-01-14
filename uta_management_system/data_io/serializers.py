@@ -20,7 +20,7 @@ class ShiftSerializer(serializers.ModelSerializer):
 class UTASerializer(serializers.ModelSerializer):
     class Meta:
         model = UTA
-        fields = ("lastname", "firstname", "emplid", "shifts")
+        fields = ("fullname", "emplid", "shifts")
         lookup_field = "emplid"
 
 
@@ -34,6 +34,13 @@ class RandomPassSerializer(serializers.ModelSerializer):
 class CheckinSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkin
-        fields = ["emplid", "shift", "late_mins", "number_of_shifts", "alternate_day"]
+        fields = [
+            "emplid",
+            "shift",
+            "late_mins",
+            "number_of_shifts",
+            "covered_by",
+            "alternate_day",
+        ]
         read_only_fields = ["shift", "late_mins"]
         extra_kwargs = {"alternate_day": {"write_only": True}}

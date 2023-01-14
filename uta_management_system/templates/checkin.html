@@ -9,28 +9,48 @@
         <script src="{% static "script/script.js" %}"></script>
     </head>
     <div class="content">
-        <form method="POST">
-            {% csrf_token %}
-            <input pattern="[0-9]{8}" placeholder="UTA Emplid (e.g.11111111)" name='emplid'><br>
-            <input type="number" value="0" min="0" max="5" placeholder="Additional shifts after current shift" name="number_of_shifts"><br>
-            <label><input type="checkbox" class="alternate-toggle">CUNY Alternate Day</label>
-            <select name="alternate_day" class="alternate-day-selector">
-                <option value="">Select Alternate Day</option>
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Wednesday">Wednesday</option>
-                <option value="Thursday">Thursday</option>
-                <option value="Friday">Friday</option>
-            </select>
-            <br>
-            <div class="timeout">
+        {% if on_shift %}
+            <form method="POST">
+                {% csrf_token %}
+                <label>Emplid: <input name='covered_by' value="{{covered_by}}" readonly></label><br>
+                <label>Additional shifts: <input name="number_of_shifts" value="{{shift_num}}" readonly></label><br>
+                <label>CUNY Alternate Schedule: <input name="alternate_day" value="{{alt_day}}" readonly></label><br>
+                <body>Who are you covering?</body>
+                {% for uta in on_shift %}
+                    <input type="submit" name="fullname" value="{{uta}}"></label>
+                {% endfor %}
+            </form>
+        {% else %}
+            <form method="POST">
+                {% csrf_token %}
+                <input pattern="[0-9]{8}" required="required" placeholder="UTA Emplid (e.g.11111111)" name='emplid'><br>
+                <input type="number" value="0" min="0" max="5" required="required" placeholder="Additional shifts after current shift" name="number_of_shifts"><br>
+                <label><input type="checkbox" class="alternate-toggle">CUNY Alternate Day</label>
+                <select name="alternate_day" class="alternate-day-selector">
+                    <option value="">Select Alternate Day</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                </select><br>
                 {% if messages %}
                     {% for message in messages %}
-                        <p {% if message.tags %} class="{{message.tags}}-msg" {% endif %}>{{message}}</p>
+                        <p  class="{{message.tags}}-msg timeout" >{{message}}</p>
                     {% endfor %}
                 {% endif %}
-            </div>
-            <button type='submit'>Checkin</button>
-        </form>
+                {% if on_shift %}
+                    <label> Who are you covering?
+                        <select name="covering">
+                            {% for message in messages %}
+                                <option value="{{message}}">{{ message }}</option>
+                            {% endfor %}
+                        </select>
+                    </label><br>
+                {% endif %}
+                <button type='submit'>Checkin</button>
+            </form>
+        {% endif %}
+        
     </div>
 </html>
