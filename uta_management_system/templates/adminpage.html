@@ -13,7 +13,6 @@
         <body>The random link for today is: <span class="spoiler">{{ random_pass }}</span></body>
         <form method="POST">
             {% csrf_token %}
-            <label>
                 <input type='url' name='file_link'>
             </label>
             <button type='submit'>Update Schedule</button>
