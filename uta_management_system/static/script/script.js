@@ -23,3 +23,7 @@ $(document).keydown(function(e){
         return false;
     }
 });
+
+function copy(code) {
+    navigator.clipboard.writeText(code);
+}

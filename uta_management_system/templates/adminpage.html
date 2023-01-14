@@ -10,7 +10,7 @@
     </head>
 
     <div class="content">
-        <body>The random link for today is: <span class="spoiler">{{ random_pass }}</span></body>
+        <body>The random link for today is: <span class="tooltip"><span class="spoiler" onclick=copy("{{  random_pass  }}") style="cursor: pointer;">{{ random_pass }}</span></span></body>
         <form method="POST">
             {% csrf_token %}
             <input type='url' name='file_link'>
