@@ -10,28 +10,28 @@
     </head>
 
     <div class="content">
-    <div class="link">
-        <body>The random link for today is:
-            <span class="tooltip"><span class="spoiler" onclick=copy("{{  random_pass  }}") style="cursor: pointer;">{{ random_pass }}
-                <span class="tooltiptext" id="myTooltip">Copy to clipboard</span>
-                    </span>
-            </span>
-        </body>
-    </div>
-    <div class="update">
-        <form method="POST">
-            {% csrf_token %}
-            <p>Schedule Update</p>
-            <input type='url' name='file_link'>
-            <button type='submit'>Update</button>
-            <div class="timeout">
-                {% if messages %}
-                    {% for message in messages %}
-                        <p {% if message.tags %} class="{{message.tags}}-msg" {% endif %}>{{message}}</p>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        </form>
-    </div>
+        <div class="link">
+            <body>The random link for today is:
+                <span class="tooltip spoiler" onclick=copy("{{  random_pass  }}") style="cursor: pointer;">
+                    {{ random_pass }}
+                    <span class="tooltiptext" id="myTooltip">copy</span>
+                </span>
+            </body>
+        </div>
+        <div class="update">
+            <form method="POST">
+                {% csrf_token %}
+                <p>Schedule Update</p>
+                <input type='url' name='file_link'>
+                <button type='submit'>Update</button>
+                <div class="timeout">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p {% if message.tags %} class="{{message.tags}}-msg" {% endif %}>{{message}}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </form>
+        </div>
     </div>
 </html>
