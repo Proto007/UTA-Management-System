@@ -1,15 +1,30 @@
 .content {
+    font-size: 25px;
     max-width: 100%;
-    height: auto;
     display: table;
     position: center;
     margin: 0 auto;
-    padding: 20vh;
+    text-align: center;
+    color: white;
+}
+
+.link {
+    position: relative;
+    margin: 0 auto;
+    padding: 10vh;
+}
+
+.update {
+    max-width: 100%;
+    position: center;
+    margin: 0 auto;
+    padding: 25vh;
     text-align: center;
     color: white;
 }
 
 .spoiler {
+    position: relative;
     display: inline-block;
     cursor: pointer;
     color: white;
@@ -44,7 +59,7 @@ body {
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 140px;
+    width: 200px;
     background-color: black;
     color: #fff;
     text-align: center;
@@ -54,7 +69,7 @@ body {
     z-index: 1;
     bottom: 100%;
     left: 50%;
-    margin-left: -60px;
+    margin-left: -99px;
     opacity: 0;
     transition: opacity 1s;
 }
