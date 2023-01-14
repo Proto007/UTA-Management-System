@@ -26,4 +26,7 @@ $(document).keydown(function(e){
 
 function copy(code) {
     navigator.clipboard.writeText(code);
+    const tooltip = document.getElementById("myTooltip");
+    tooltip.innerHTML = "Copied to keyboard";
+    tooltip.style.color="green";
 }
