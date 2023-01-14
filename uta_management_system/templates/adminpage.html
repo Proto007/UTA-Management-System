@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {% load rest_framework %}
-<html>
+<html lang = "en">
     <head>
         <title>Admin</title>
         {% load static %}
@@ -8,10 +8,9 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
         <script src="{% static "script/script.js" %}"></script>
     </head>
+
     <div class="content">
-        <body>
-            The random link for today is: {{ random_pass }}
-        </body>
+        <body>The random link for today is: <span class="spoiler">{{ random_pass }}</span></body>
         <form method="POST">
             {% csrf_token %}
             <input type='url' name='file_link'>

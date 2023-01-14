@@ -81,13 +81,13 @@ class Checkin(APIView):
 
 class AdminActions(APIView):
     renderer_classes = [TemplateHTMLRenderer]
-    template_name = "admin_actions.html"
+    template_name = "adminpage.html"
 
     def get(self, request):
         random_pass = requests.post(
             request.build_absolute_uri(reverse("dataio:random_pass-list")), json={}
         ).json()["random_pass"]
-        return render(request, "admin_actions.html", {"random_pass": random_pass})
+        return render(request, "adminpage.html", {"random_pass": random_pass})
 
     def post(self, request):
         response = requests.post(
