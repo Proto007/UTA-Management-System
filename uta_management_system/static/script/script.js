@@ -23,3 +23,10 @@ $(document).keydown(function(e){
         return false;
     }
 });
+
+function copy(code) {
+    navigator.clipboard.writeText(code);
+    const tooltip = document.getElementById("myTooltip");
+    tooltip.innerHTML = "copied";
+    tooltip.style.color="green";
+}

@@ -1,15 +1,32 @@
 .content {
+    font-size: 25px;
     max-width: 100%;
-    height: auto;
     display: table;
     position: center;
     margin: 0 auto;
-    padding: 20vh;
+    text-align: center;
+    color: white;
+}
+
+.link {
+    position: relative;
+    margin: 0 auto;
+    padding: 10vh;
+}
+
+.update {
+    max-width: 100%;
+    position: center;
+    margin: 0 auto;
+    padding: 25vh;
     text-align: center;
     color: white;
 }
 
 .spoiler {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
     color: white;
     background-color:white;
 }
@@ -21,6 +38,7 @@
 body {
     background-color: black;
 }
+
 .success-msg {
     color:greenyellow;
     margin:0;
@@ -31,4 +49,44 @@ body {
     color:red;
     margin:0;
     padding:0;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -99px;
+    opacity: 0;
+    transition: opacity 1s;
+    font-size: 20px;
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }
