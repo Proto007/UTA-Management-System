@@ -25,15 +25,15 @@ class DataIOViewSet(viewsets.ModelViewSet):
     def get_schedules(self, link: str) -> bool:
         """
         Populate the database with `UTA` and `Shift` information from the given `link`
-        
+
         Args:
             link: `str` object representing a link with google sheet or csv file
         Returns:
             `True` if successfully read data from the given `link`, otherwise returns `False`
         """
         #  if provided link is a google sheet, export the sheet as csv
-        if "docs.google.com/spreadsheets" in link: 
-            link = link.replace("/edit?usp=sharing", "/export?format=csv&gid=0") 
+        if "docs.google.com/spreadsheets" in link:
+            link = link.replace("/edit?usp=sharing", "/export?format=csv&gid=0")
         # Read a dataframe from `link`, return False if the read operation fails
         try:
             df = pd.read_csv(link)
@@ -41,8 +41,8 @@ class DataIOViewSet(viewsets.ModelViewSet):
             return False
 
         # Add UTAs to database from the dataframe `df`
-        uta_names = df.iloc[:, 0].to_list() # get UTA names from Col 1
-        emplid = df.iloc[:, 1].to_list() # get UTA emplids from Col 2
+        uta_names = df.iloc[:, 0].to_list()  # get UTA names from Col 1
+        emplid = df.iloc[:, 1].to_list()  # get UTA emplids from Col 2
         # <emplid: name> mapping for all the UTAs
         uta_dict = {emplid[i]: uta_names[i] for i in range(len(emplid))}
         # iterate through the `uta_dict` dictionary and create a new UTA with the emplid and name if the UTA doesn't already exist in the database
@@ -52,7 +52,7 @@ class DataIOViewSet(viewsets.ModelViewSet):
             except UTA.DoesNotExist:
                 new_uta = UTA.objects.create(fullname=name, emplid=empl)
                 new_uta.save()
-        
+
         # Dictionary used to get days based on the letters representing that day in the shifts schedule
         DAYS = {
             "M": "Monday",
@@ -64,15 +64,19 @@ class DataIOViewSet(viewsets.ModelViewSet):
         # iterate through the column names that contains shifts information (starting from column 2)
         for s in df.columns[2:]:
             # parse the column name (e.g. M 11:30 - 13:00)
-            shift = s.split() # ["M", "11:30", "-", "13:00"]
+            shift = s.split()  # ["M", "11:30", "-", "13:00"]
             # break out of the loop stop reading shift informations if the column name is not a shift description
             if shift[0].strip() not in DAYS.keys():
                 break
-            
+
             # get the name of the UTA's who are on shift for this particular shift
-            on_shift = df.loc[df[s] == 1.0].iloc[:, 1].to_list() # UTA names in the rows with a 1 are considered to be on shift
-            day = DAYS[f"{shift[0].strip()}"] # use `DAYS` dictionary to get the day from parsed shift information
-            # create `time` objects for the start time and end time from parsed shift information 
+            on_shift = (
+                df.loc[df[s] == 1.0].iloc[:, 1].to_list()
+            )  # UTA names in the rows with a 1 are considered to be on shift
+            day = DAYS[
+                f"{shift[0].strip()}"
+            ]  # use `DAYS` dictionary to get the day from parsed shift information
+            # create `time` objects for the start time and end time from parsed shift information
             start = time(int(shift[1][:2]), int(shift[1][3:]), 0)
             end = time(int(shift[3][:2]), int(shift[3][3:]), 0)
             # try to create and add a new `Shift` object if the shift doesn't exist in the database already
@@ -89,8 +93,8 @@ class DataIOViewSet(viewsets.ModelViewSet):
             for empl in on_shift:
                 uta = UTA.objects.get(emplid=empl)
                 uta.shifts.add(new_shift)
-        
-        return True # return True indicating that the Shift objects and UTA objects were read successfully
+
+        return True  # return True indicating that the Shift objects and UTA objects were read successfully
 
     def create(self, request):
         """
@@ -99,7 +103,7 @@ class DataIOViewSet(viewsets.ModelViewSet):
         """
         # get the `old_link` from the database if the old link exists
         old_link = DataIO.objects.all()[0].file_link if DataIO.objects.all() else ""
-        # get the `new_link` from POST request 
+        # get the `new_link` from POST request
         new_link = request.data
         # delete all Shift, UTA and DataIO objects from the database
         DataIO.objects.all().delete()
@@ -145,6 +149,7 @@ class RandomPassViewSet(viewsets.ModelViewSet):
     """
     Viewset for `RandomPass` model
     """
+
     queryset = RandomPass.objects.all()
     http_method_names = ["post"]
     serializer_class = RandomPassSerializer
@@ -176,13 +181,14 @@ class CheckinViewSet(viewsets.ModelViewSet):
     """
     Viewset for `Checkin` model
     """
+
     queryset = Checkin.objects.all()
     serializer_class = CheckinSerializer
 
     def get_next_shift(self, shift: Shift, num: int) -> list[Shift]:
         """
         Retrieves `num` number of Shift objects that start immediately after the given `shift`
-        
+
         Args:
             shift: a `Shift` object
             num: `int` representing how many shifts to get
@@ -205,18 +211,18 @@ class CheckinViewSet(viewsets.ModelViewSet):
         index = shifts.index(shift)
         # get `num` number of shifts starting from `index` in the retrieved list and append them to an empty list
         result = []
-        for i in range(1,num+1):
+        for i in range(1, num + 1):
             # return shifts obtained so far if adding num exceeds the length of the retrieved list
             if index + i > len(shifts) - 1:
                 return result
             result.append(shifts[index + i])
         # return the shifts list
-        return result 
+        return result
 
-    def get_current_shift(self, day=None) -> tuple[Shift,int]:
+    def get_current_shift(self, day=None) -> tuple[Shift, int]:
         """
         Retrieves a `Shift` that is happening at the current time. Calculate how many minutes have passed since the start of the retrieved `Shift` object.
-        
+
         Args:
             day: used if provided to get the shift on that particular `day`
         Returns:
@@ -275,7 +281,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
             )
         # get the next shifts based on `num_of_shifts`
         next_shifts = self.get_next_shift(shift[0], int(num_of_shifts))
-        
+
         # if the UTA is extremely late to their shift, return 403 response and prevent them from checking in
         # UTA is extremely late if they missed 1/3 of their shift
         if shift[1] > (
@@ -313,7 +319,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
                 emplid=empl, shift=shift[0], late_mins=shift[1], covered_by=covered_by
             )
             new_checkin.save()
-        
+
         # checkin for the additional shifts and keep track of how many shifts have been checked in
         count = 1
         for s in next_shifts:
@@ -331,7 +337,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
                 )
                 next_shift_checkin.save()
                 count += 1
-        
+
         # return 201 response indicating a successful checkin
         return Response(
             {"message": f"Checked in successfully for {count} shift(s)"},
