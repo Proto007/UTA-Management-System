@@ -18,6 +18,7 @@ from django.urls import include, path, re_path
 
 from . import views
 
+# assign endpoints to different views and apps
 urlpatterns = [
     re_path("^$", views.homepage),
     path(
