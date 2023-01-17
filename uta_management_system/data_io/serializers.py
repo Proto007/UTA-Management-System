@@ -35,6 +35,7 @@ class CheckinSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkin
         fields = [
+            "created_at",
             "emplid",
             "shift",
             "late_mins",
@@ -42,5 +43,10 @@ class CheckinSerializer(serializers.ModelSerializer):
             "covered_by",
             "alternate_day",
         ]
-        read_only_fields = ["shift", "late_mins"]
-        extra_kwargs = {"alternate_day": {"write_only": True}}
+        read_only_fields = ["created_at", "shift", "late_mins"]
+
+
+class TimeSheetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TimeSheet
+        fields = ["start_date", "end_date"]

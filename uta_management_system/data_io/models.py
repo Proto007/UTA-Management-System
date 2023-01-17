@@ -69,6 +69,7 @@ class Checkin(models.Model):
     `Checkin` model contains instances of successful checkins by the UTA to their assigned Shift(s)
     """
 
+    created_at = models.DateTimeField(auto_now_add=True)  # checkin time
     # <Day: Description> provides choices for alternate schedule
     DAYS = (
         ("", "Not an alternate schedule"),
@@ -96,3 +97,12 @@ class Checkin(models.Model):
     alternate_day = models.CharField(
         max_length=10, choices=DAYS, default=""
     )  # allows checkin to another day of the week if CUNY is following alternate day schedule
+
+
+class TimeSheet(models.Model):
+    """
+    `TimeSheet` model allows creation timesheets given two dates
+    """
+
+    start_date = models.DateField()
+    end_date = models.DateField()

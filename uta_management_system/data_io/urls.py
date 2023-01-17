@@ -11,6 +11,7 @@ router.register(
     r"6d975d9e9f5e6d5a461ded16097ec288", RandomPassViewSet, basename="random_pass"
 )
 router.register(r"checkin", CheckinViewSet, basename="checkin")
+router.register(r"timesheet", TimeSheetViewSet, basename="timesheet")
 
 # The API URLs are now determined automatically by the router
 urlpatterns = [
