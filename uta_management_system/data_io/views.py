@@ -5,6 +5,8 @@ import hashlib
 from datetime import datetime, time
 
 import pandas as pd
+import pytz
+from django.http import HttpResponse
 from rest_framework import status, viewsets
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -343,3 +345,52 @@ class CheckinViewSet(viewsets.ModelViewSet):
             {"message": f"Checked in successfully for {count} shift(s)"},
             status=status.HTTP_201_CREATED,
         )
+
+
+class TimeSheetViewSet(viewsets.ModelViewSet):
+    """
+    Viewset for TimeSheet class
+    """
+
+    queryset = TimeSheet.objects.all()
+    serializer_class = TimeSheetSerializer
+
+    def create(self, request):
+        start = datetime.fromisoformat(request.data["start_date"]).replace(
+            tzinfo=pytz.timezone("US/Eastern")
+        )
+        end = datetime.fromisoformat(request.data["end_date"]).replace(
+            tzinfo=pytz.timezone("US/Eastern")
+        )
+        checkins = list(
+            Checkin.objects.filter(created_at__gte=start, created_at__lte=end)
+        )
+        data = [
+            [
+                c.created_at,
+                c.emplid,
+                c.shift.description,
+                c.late_mins,
+                c.covered_by,
+                c.alternate_day,
+            ]
+            for c in checkins
+        ]
+        df = pd.DataFrame(
+            data,
+            columns=[
+                "Checkin_Time",
+                "Emplid",
+                "Shift",
+                "Late_mins",
+                "Covered_by",
+                "Alternate_schedule",
+            ],
+        )
+        response = HttpResponse(content_type="text/csv", status=status.HTTP_200_OK)
+        response["Content-Disposition"] = "attachment; filename=timesheet.csv"
+        try:
+            df.to_csv(path_or_buf=response, index=False)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return response
