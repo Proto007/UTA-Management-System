@@ -2,7 +2,9 @@
 Define, specify and update REST Api operations' behaviors
 """
 import hashlib
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
+from io import BytesIO
+from zipfile import ZipFile
 
 import pandas as pd
 import pytz
@@ -355,16 +357,40 @@ class TimeSheetViewSet(viewsets.ModelViewSet):
     queryset = TimeSheet.objects.all()
     serializer_class = TimeSheetSerializer
 
-    def create(self, request):
-        start = datetime.fromisoformat(request.data["start_date"]).replace(
-            tzinfo=pytz.timezone("US/Eastern")
-        )
-        end = datetime.fromisoformat(request.data["end_date"]).replace(
-            tzinfo=pytz.timezone("US/Eastern")
-        )
+    def get_weeks(self, start: datetime, end: datetime) -> list[list[datetime]]:
+        """
+        Takes two dates and returns weeks between those dates in `[[mon, fri], [mon1, fri1] ...]` format.
+
+        Args:
+            start: `datetime` object representing start of the weeks sequence
+            end: `datetime` object representing the end of the weeks sequence
+        Returns:
+            list of lists of two `datetime` objects in this format: `[[mon, fri], [mon1, fri1] ...]`
+        """
+        # initialize return array and first monday
+        res, monday = [], start
+        # loops until the next monday exceeds `end` date
+        while monday < end:
+            friday = monday + timedelta((4 - monday.weekday()) % 7)  # get next friday
+            res.append([monday, friday])
+            monday = friday + timedelta(3)  # get next monday
+        return res
+
+    def get_timesheet(self, start: datetime, end: datetime) -> tuple[pd.DataFrame, str]:
+        """
+        Takes two dates and returns timesheet dataframe and timesheet name between those days
+
+        Args:
+            start: `datetime` object representing start of the week
+            end: `datetime` object representing the end of the week (this is going to be a Friday)
+        Returns:
+            tuple of `pd.DataFrame` and `str` objects
+        """
+        # get checkin information from start to end dates
         checkins = list(
             Checkin.objects.filter(created_at__gte=start, created_at__lte=end)
         )
+        # create timesheet dataframe
         data = [
             [
                 c.created_at,
@@ -387,10 +413,42 @@ class TimeSheetViewSet(viewsets.ModelViewSet):
                 "Alternate_schedule",
             ],
         )
-        response = HttpResponse(content_type="text/csv", status=status.HTTP_200_OK)
-        response["Content-Disposition"] = "attachment; filename=timesheet.csv"
-        try:
-            df.to_csv(path_or_buf=response, index=False)
-        except:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # return timesheet dataframe and name containing start and end dates
+        return (
+            df,
+            f'timesheet_{start.strftime("%m_%d_%Y")}_to_{start.strftime("%m_%d_%Y")}.csv',
+        )
+
+    def create(self, request):
+        """
+        Takes two dates and creates csv files for the weeks between those dates.
+        The csv files are compressed into a csv and returned from POST request.
+        """
+        # create timezone aware start and end dates
+        start = datetime.fromisoformat(request.data["start_date"]).replace(
+            tzinfo=pytz.timezone("US/Eastern")
+        )
+        end = datetime.fromisoformat(request.data["end_date"]).replace(
+            tzinfo=pytz.timezone("US/Eastern")
+        )
+        # get weeks between start and end date
+        weeks = self.get_weeks(start, end)
+        # get timesheets and csv names for the weeks between start and end date
+        timesheets = [self.get_timesheet(w[0], w[1]) for w in weeks]
+
+        # initialize zip file buffer
+        buffer = BytesIO()
+        zip_file = ZipFile(buffer, "w")
+        for ts in timesheets:
+            # save the timesheet csv as bytes
+            df, name = ts[0], ts[1]
+            csv_buff = BytesIO()
+            df.to_csv(csv_buff, index=False)
+            # add the csv to the zip file
+            zip_file.writestr(name, csv_buff.getvalue())
+        # set content for response as zip file and add zip file from `buffer`
+        response = HttpResponse(buffer.getvalue())
+        response["Content-Type"] = "application/x-zip-compressed"
+        # set response zip file's file name
+        response["Content-Disposition"] = "attachment; filename=timesheets.zip"
         return response
