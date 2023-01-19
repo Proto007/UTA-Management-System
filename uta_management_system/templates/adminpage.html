@@ -18,20 +18,22 @@
                 </span>
             </body>
         </div>
-        <div class="update">
-            <form method="POST">
-                {% csrf_token %}
-                <p>Schedule Update</p>
-                <input type='url' name='file_link'>
-                <button type='submit'>Update</button>
-                <div class="timeout">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <p {% if message.tags %} class="{{message.tags}}-msg" {% endif %}>{{message}}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-            </form>
-        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <p>Schedule Update</p>
+            <input type='url' name='file_link'>
+            <button type='submit'>Update</button>
+            <div class="timeout">
+                {% if messages %}
+                    {% for message in messages %}
+                        <p {% if message.tags %} class="{{message.tags}}-msg" {% endif %}>{{message}}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <p>Get Timesheets</p>
+            <label>Start:<input type="date" name="start_date"></label>
+            <label>Weeks:<input type="number" value="0" min="0" max="4" required placeholder="number of weeks" name="weeks"></label>
+            <button type='submit' name="">Download</button>
+        </form>
     </div>
 </html>

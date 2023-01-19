@@ -24,7 +24,7 @@
             <form method="POST">
                 {% csrf_token %}
                 <input pattern="[0-9]{8}" required="required" placeholder="UTA Emplid (e.g.11111111)" name='emplid'><br>
-                <input type="number" value="0" min="0" max="5" required="required" placeholder="Additional shifts after current shift" name="number_of_shifts"><br>
+                <input type="number" value="0" min="0" max="5" required placeholder="Additional shifts after current shift" name="number_of_shifts"><br>
                 <label><input type="checkbox" class="alternate-toggle">CUNY Alternate Day</label>
                 <select name="alternate_day" class="alternate-day-selector">
                     <option value="">Select Alternate Day</option>
