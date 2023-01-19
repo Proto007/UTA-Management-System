@@ -316,11 +316,11 @@ class CheckinViewSet(viewsets.ModelViewSet):
         # create a new `Checkin` object with all the information if the `Checkin` object doesn't already exist in the database
         try:
             new_checkin = Checkin.objects.get(
-                emplid=empl, shift=shift[0], covered_by=covered_by
+                emplid=empl, shift=shift[0].description, covered_by=covered_by
             )
         except Checkin.DoesNotExist:
             new_checkin = Checkin.objects.create(
-                emplid=empl, shift=shift[0], late_mins=shift[1], covered_by=covered_by
+                emplid=empl, shift=shift[0].description, late_mins=shift[1], covered_by=covered_by
             )
             new_checkin.save()
 
@@ -330,14 +330,14 @@ class CheckinViewSet(viewsets.ModelViewSet):
             # only checkin if it hasn't been done already
             try:
                 next_shift_checkin = Checkin.objects.get(
-                    emplid=empl, shift=s, covered_by=covered_by
+                    emplid=empl, shift=s.description, covered_by=covered_by
                 )
             except Checkin.DoesNotExist:
                 #  stop checking in if the `UTA`` is not on any of the additional shifts
                 if s not in list(uta.shifts.all()):
                     break
                 next_shift_checkin = Checkin.objects.create(
-                    emplid=empl, shift=s, covered_by=covered_by
+                    emplid=empl, shift=s.description, covered_by=covered_by
                 )
                 next_shift_checkin.save()
                 count += 1
@@ -395,7 +395,7 @@ class TimeSheetViewSet(viewsets.ModelViewSet):
             [
                 c.created_at,
                 c.emplid,
-                c.shift.description,
+                c.shift,
                 c.late_mins,
                 c.covered_by,
                 c.alternate_day,
