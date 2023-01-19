@@ -82,9 +82,9 @@ class Checkin(models.Model):
     emplid = models.CharField(
         max_length=8, validators=[MinLengthValidator(8)]
     )  # UTA's 8 digit unique CUNY empl ID
-    shift = models.ForeignKey(
-        Shift, on_delete=models.CASCADE
-    )  # allows many `Checkin` objects to reference single `Shift` object
+    shift = models.CharField(
+        max_length=30
+    )  # store shift description, e.g. "MON 12:00 - 13:30"
     late_mins = models.IntegerField(
         default=0
     )  # stores how late the checkin is from the `shift` start time
