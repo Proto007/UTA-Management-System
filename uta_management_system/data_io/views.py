@@ -416,7 +416,7 @@ class TimeSheetViewSet(viewsets.ModelViewSet):
         # return timesheet dataframe and name containing start and end dates
         return (
             df,
-            f'timesheet_{start.strftime("%m_%d_%Y")}_to_{start.strftime("%m_%d_%Y")}.csv',
+            f'timesheet_{start.strftime("%m_%d_%Y")}_to_{end.strftime("%m_%d_%Y")}.csv',
         )
 
     def create(self, request):
