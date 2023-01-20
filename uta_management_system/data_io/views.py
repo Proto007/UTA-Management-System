@@ -316,7 +316,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
         # create a new `Checkin` object with all the information if the `Checkin` object doesn't already exist in the database
         try:
             new_checkin = Checkin.objects.get(
-                emplid=empl, shift=shift[0].description, covered_by=covered_by
+                emplid=empl, shift=shift[0].description
             )
         except Checkin.DoesNotExist:
             new_checkin = Checkin.objects.create(
@@ -330,7 +330,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
             # only checkin if it hasn't been done already
             try:
                 next_shift_checkin = Checkin.objects.get(
-                    emplid=empl, shift=s.description, covered_by=covered_by
+                    emplid=empl, shift=s.description
                 )
             except Checkin.DoesNotExist:
                 #  stop checking in if the `UTA`` is not on any of the additional shifts
