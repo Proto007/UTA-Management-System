@@ -31,9 +31,9 @@
                 {% endif %}
             </div>
             <p>Get Timesheets</p>
-            <label>Start:<input type="date" name="start_date"></label>
-            <label>Weeks:<input type="number" value="0" min="0" max="4" required placeholder="number of weeks" name="weeks"></label>
-            <button type='submit' name="">Download</button>
+            <label>Start:<input type="date" name="start_date" required></label>
+            <label>Weeks:<input type="number" value="1" min="0" max="5" name="weeks" required></label>
+            <button type='submit' name="timesheet" value="True">Download</button>
         </form>
     </div>
 </html>
