@@ -12,7 +12,7 @@
         {% if on_shift %}
             <form method="POST">
                 {% csrf_token %}
-                <label>Emplid: <input name='covered_by' value="{{covered_by}}" readonly></label><br>
+                <label>Emplid: <input name='covered_by' value="{{covering}}" readonly></label><br>
                 <label>Additional shifts: <input name="number_of_shifts" value="{{shift_num}}" readonly></label><br>
                 <label>CUNY Alternate Schedule: <input name="alternate_day" value="{{alt_day}}" readonly></label><br>
                 <body>Who are you covering?</body>

@@ -313,31 +313,54 @@ class CheckinViewSet(viewsets.ModelViewSet):
             # the 303 response is handled by frontend to allow covering shifts
             return Response({"on_shift": on_shift}, status=status.HTTP_303_SEE_OTHER)
 
-        # create a new `Checkin` object with all the information if the `Checkin` object doesn't already exist in the database
+        # create a new `Checkin` object with all the information if there isnt a checkin object for the shift and uta on today's date
         try:
-            new_checkin = Checkin.objects.get(
-                emplid=empl, shift=shift[0].description, covered_by=covered_by
+            uta_checkins = list(
+                Checkin.objects.filter(emplid=empl, shift=shift[0].description)
             )
+            new_checkin = None
+            # try to find a checkin object that was created today within all the checkins by this uta for current shift
+            for c in uta_checkins:
+                if c.date == datetime.today().date:
+                    new_checkin = c
+                    break
+            if not new_checkin:
+                raise Checkin.DoesNotExist
         except Checkin.DoesNotExist:
             new_checkin = Checkin.objects.create(
-                emplid=empl, shift=shift[0].description, late_mins=shift[1], covered_by=covered_by
+                emplid=empl,
+                shift=shift[0].description,
+                late_mins=shift[1],
+                covered_by=covered_by,
+                alternate_day=request.data["alternate_day"],
             )
             new_checkin.save()
 
         # checkin for the additional shifts and keep track of how many shifts have been checked in
         count = 1
         for s in next_shifts:
-            # only checkin if it hasn't been done already
+            # only checkin if it hasn't been done in today's date
             try:
-                next_shift_checkin = Checkin.objects.get(
-                    emplid=empl, shift=s.description, covered_by=covered_by
+                uta_checkins = list(
+                    Checkin.objects.filter(emplid=empl, shift=shift[0].description)
                 )
+                next_shift_checkin = None
+                # try to find a checkin object that was created today within all the checkins by this uta for current shift
+                for c in uta_checkins:
+                    if c.date == datetime.today().date:
+                        next_shift_checkin = c
+                        break
+                if not next_shift_checkin:
+                    raise Checkin.DoesNotExist
             except Checkin.DoesNotExist:
-                #  stop checking in if the `UTA`` is not on any of the additional shifts
+                #  stop checking in if the `UTA` is not on any of the additional shifts
                 if s not in list(uta.shifts.all()):
                     break
                 next_shift_checkin = Checkin.objects.create(
-                    emplid=empl, shift=s.description, covered_by=covered_by
+                    emplid=empl,
+                    shift=s.description,
+                    covered_by=covered_by,
+                    alternate_day=request.data["alternate_day"],
                 )
                 next_shift_checkin.save()
                 count += 1
@@ -371,7 +394,9 @@ class TimeSheetViewSet(viewsets.ModelViewSet):
         res, monday = [], start
         # loops until the next monday exceeds `end` date
         while monday < end:
-            friday = monday + timedelta((4 - monday.weekday()) % 7)  # get next friday
+            friday = (monday + timedelta((4 - monday.weekday()) % 7)).replace(
+                hour=23, minute=59
+            )  # get next friday
             res.append([monday, friday])
             monday = friday + timedelta(3)  # get next monday
         return res

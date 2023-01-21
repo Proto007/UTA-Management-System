@@ -1,6 +1,8 @@
+from datetime import datetime, timedelta
+
 import requests
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -90,6 +92,29 @@ class AdminActions(APIView):
         return render(request, "adminpage.html", {"random_pass": random_pass})
 
     def post(self, request):
+        if request.data.get("timesheet", ""):
+            start_date = datetime.strptime(request.data["start_date"], "%Y-%m-%d")
+            weeks = int(request.data["weeks"])
+
+            end_date = start_date
+            while True:
+                if end_date.weekday() == 4:
+                    weeks -= 1
+                if weeks == 0:
+                    break
+                end_date += timedelta(days=1)
+
+            response = requests.post(
+                request.build_absolute_uri(reverse("dataio:timesheet-list")),
+                json={
+                    "start_date": start_date.isoformat(sep="T"),
+                    "end_date": end_date.isoformat(sep="T"),
+                },
+            )
+            response = HttpResponse(response, content_type="application/force-download")
+            response["Content-Disposition"] = "attachment; filename=timesheets.zip"
+            return response
+
         response = requests.post(
             request.build_absolute_uri(reverse("dataio:update_schedule-list")),
             json={"file_link": request.data["file_link"]},
