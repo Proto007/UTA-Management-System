@@ -332,7 +332,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
                 shift=shift[0].description,
                 late_mins=shift[1],
                 covered_by=covered_by,
-                alternate_day=request.data["alternate_day"],
+                alternate_day=datetime.now().strftime("%A"),
             )
             new_checkin.save()
 
@@ -360,7 +360,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
                     emplid=empl,
                     shift=s.description,
                     covered_by=covered_by,
-                    alternate_day=request.data["alternate_day"],
+                    alternate_day=datetime.now().strftime("%A"),
                 )
                 next_shift_checkin.save()
                 count += 1
