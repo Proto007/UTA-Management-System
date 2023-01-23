@@ -401,47 +401,57 @@ class TimeSheetViewSet(viewsets.ModelViewSet):
             monday = friday + timedelta(3)  # get next monday
         return res
 
-    def get_timesheet(self, start: datetime, end: datetime) -> tuple[pd.DataFrame, str]:
+    def get_timesheet(self, start: datetime, end: datetime) -> tuple[pd.DataFrame, pd.DataFrame, str]:
         """
-        Takes two dates and returns timesheet dataframe and timesheet name between those days
+        Returns two dataframes consisting of checkin information and timesheet between given `start` and `end` date
+        If there are no checkins, return empty dataframes and empty string
 
         Args:
             start: `datetime` object representing start of the week
             end: `datetime` object representing the end of the week (this is going to be a Friday)
         Returns:
-            tuple of `pd.DataFrame` and `str` objects
+            tuple of two `pd.DataFrame` objects and one `str` object
         """
         # get checkin information from start to end dates
         checkins = list(
             Checkin.objects.filter(created_at__gte=start, created_at__lte=end)
         )
-        # create timesheet dataframe
-        data = [
-            [
-                c.created_at,
-                c.emplid,
-                c.shift,
-                c.late_mins,
-                c.covered_by,
-                c.alternate_day,
-            ]
-            for c in checkins
-        ]
-        df = pd.DataFrame(
-            data,
+        # if there are no checkins between those days, return empty dataframes and empty string
+        if not checkins:
+            return (pd.DataFrame(), pd.DataFrame(), "")
+        
+        # create dataframe with all checkins in order
+        checkin_data = []
+        for c in checkins:
+            name = UTA.objects.get(emplid=c.emplid).fullname
+            hours = (datetime.combine(datetime.today(),Shift.objects.get(description=c.shift).end) - datetime.combine(datetime.today(),Shift.objects.get(description=c.shift).start)).total_seconds()/3600
+            sub_name = ""
+            if c.covered_by:
+                sub_name = UTA.objects.get(emplid=c.covered_by).fullname
+            checkin_data.append([c.created_at, name, c.emplid, hours, c.shift, c.late_mins, sub_name, c.alternate_day])
+        checkins_df = pd.DataFrame(
+            checkin_data,
             columns=[
                 "Checkin_Time",
+                "Name",
                 "Emplid",
+                "Hours",
                 "Shift",
                 "Late_mins",
                 "Covered_by",
                 "Alternate_schedule",
             ],
         )
-        # return timesheet dataframe and name containing start and end dates
+        # create timesheet dataframe from checkins_df using `groupby()`` and `agg()``
+        timesheet_df = checkins_df.groupby('Name', as_index=False).agg({'Emplid':['min'] ,'Hours': ['sum', 'count'], 'Late_mins':['sum', 'count'], 'Alternate_schedule':['any'], 'Covered_by':["any"]})
+        # replace column names
+        timesheet_df.columns = ["Emplid", "Name", "Hours", "Shifts", "Late_mins", "Late_count", "Alternate_Schedule", "Was_covered"]
+
+        # return the dataframes and string containing start and end dates
         return (
-            df,
-            f'timesheet_{start.strftime("%m_%d_%Y")}_to_{end.strftime("%m_%d_%Y")}.csv',
+            checkins_df,
+            timesheet_df,
+            f'_{start.strftime("%m_%d_%Y")}_to_{end.strftime("%m_%d_%Y")}',
         )
 
     def create(self, request):
@@ -458,21 +468,28 @@ class TimeSheetViewSet(viewsets.ModelViewSet):
         )
         # get weeks between start and end date
         weeks = self.get_weeks(start, end)
-        # get timesheets and csv names for the weeks between start and end date
+        # get checkin dataframe, timesheet dataframe and names for each week in `weeks``
         timesheets = [self.get_timesheet(w[0], w[1]) for w in weeks]
 
         # initialize zip file buffer
-        buffer = BytesIO()
-        zip_file = ZipFile(buffer, "w")
-        for ts in timesheets:
-            # save the timesheet csv as bytes
-            df, name = ts[0], ts[1]
-            csv_buff = BytesIO()
-            df.to_csv(csv_buff, index=False)
-            # add the csv to the zip file
-            zip_file.writestr(name, csv_buff.getvalue())
+        zip_buffer = BytesIO()
+        with ZipFile(zip_buffer, "w") as z:
+            for ts in timesheets:
+                # continue to next item if there are no checkins for that week
+                if not ts[2]:
+                    continue
+                # save the dataframe csv files as bytes
+                checkins, ch_name = ts[0], f'checkins_{ts[2]}.csv'
+                timesheet, ts_name = ts[1], f'timesheet_{ts[2]}.csv'
+                ch_buff = BytesIO()
+                ts_buff = BytesIO()
+                checkins.to_csv(ch_buff, index=False)
+                timesheet.to_csv(ts_buff, index=False)
+                # add the csv files to the zip file
+                z.writestr(ch_name, ch_buff.getvalue())
+                z.writestr(ts_name, ts_buff.getvalue())
         # set content for response as zip file and add zip file from `buffer`
-        response = HttpResponse(buffer.getvalue())
+        response = HttpResponse(zip_buffer.getvalue())
         response["Content-Type"] = "application/x-zip-compressed"
         # set response zip file's file name
         response["Content-Disposition"] = "attachment; filename=timesheets.zip"
