@@ -401,7 +401,9 @@ class TimeSheetViewSet(viewsets.ModelViewSet):
             monday = friday + timedelta(3)  # get next monday
         return res
 
-    def get_timesheet(self, start: datetime, end: datetime) -> tuple[pd.DataFrame, pd.DataFrame, str]:
+    def get_timesheet(
+        self, start: datetime, end: datetime
+    ) -> tuple[pd.DataFrame, pd.DataFrame, str]:
         """
         Returns two dataframes consisting of checkin information and timesheet between given `start` and `end` date
         If there are no checkins, return empty dataframes and empty string
@@ -419,16 +421,34 @@ class TimeSheetViewSet(viewsets.ModelViewSet):
         # if there are no checkins between those days, return empty dataframes and empty string
         if not checkins:
             return (pd.DataFrame(), pd.DataFrame(), "")
-        
+
         # create dataframe with all checkins in order
         checkin_data = []
         for c in checkins:
             name = UTA.objects.get(emplid=c.emplid).fullname
-            hours = (datetime.combine(datetime.today(),Shift.objects.get(description=c.shift).end) - datetime.combine(datetime.today(),Shift.objects.get(description=c.shift).start)).total_seconds()/3600
+            hours = (
+                datetime.combine(
+                    datetime.today(), Shift.objects.get(description=c.shift).end
+                )
+                - datetime.combine(
+                    datetime.today(), Shift.objects.get(description=c.shift).start
+                )
+            ).total_seconds() / 3600
             sub_name = ""
             if c.covered_by:
                 sub_name = UTA.objects.get(emplid=c.covered_by).fullname
-            checkin_data.append([c.created_at, name, c.emplid, hours, c.shift, c.late_mins, sub_name, c.alternate_day])
+            checkin_data.append(
+                [
+                    c.created_at,
+                    name,
+                    c.emplid,
+                    hours,
+                    c.shift,
+                    c.late_mins,
+                    sub_name,
+                    c.alternate_day,
+                ]
+            )
         checkins_df = pd.DataFrame(
             checkin_data,
             columns=[
@@ -443,9 +463,26 @@ class TimeSheetViewSet(viewsets.ModelViewSet):
             ],
         )
         # create timesheet dataframe from checkins_df using `groupby()`` and `agg()``
-        timesheet_df = checkins_df.groupby('Name', as_index=False).agg({'Emplid':['min'] ,'Hours': ['sum', 'count'], 'Late_mins':['sum', 'count'], 'Alternate_schedule':['any'], 'Covered_by':["any"]})
+        timesheet_df = checkins_df.groupby("Name", as_index=False).agg(
+            {
+                "Emplid": ["min"],
+                "Hours": ["sum", "count"],
+                "Late_mins": ["sum", "count"],
+                "Alternate_schedule": ["any"],
+                "Covered_by": ["any"],
+            }
+        )
         # replace column names
-        timesheet_df.columns = ["Emplid", "Name", "Hours", "Shifts", "Late_mins", "Late_count", "Alternate_Schedule", "Was_covered"]
+        timesheet_df.columns = [
+            "Emplid",
+            "Name",
+            "Hours",
+            "Shifts",
+            "Late_mins",
+            "Late_count",
+            "Alternate_Schedule",
+            "Was_covered",
+        ]
 
         # return the dataframes and string containing start and end dates
         return (
@@ -479,8 +516,8 @@ class TimeSheetViewSet(viewsets.ModelViewSet):
                 if not ts[2]:
                     continue
                 # save the dataframe csv files as bytes
-                checkins, ch_name = ts[0], f'checkins_{ts[2]}.csv'
-                timesheet, ts_name = ts[1], f'timesheet_{ts[2]}.csv'
+                checkins, ch_name = ts[0], f"checkins_{ts[2]}.csv"
+                timesheet, ts_name = ts[1], f"timesheet_{ts[2]}.csv"
                 ch_buff = BytesIO()
                 ts_buff = BytesIO()
                 checkins.to_csv(ch_buff, index=False)
