@@ -8,32 +8,47 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
         <script src="{% static "script/script.js" %}"></script>
     </head>
-
-    <div class="content">
-        <div class="link">
-            <body>The random link for today is:
-                <span class="tooltip spoiler" onclick=copy("{{  random_pass  }}") style="cursor: pointer;">
-                    {{ random_pass }}
-                    <span class="tooltiptext" id="myTooltip">copy</span>
-                </span>
-            </body>
-        </div>
-        <form method="POST">
-            {% csrf_token %}
-            <p>Schedule Update</p>
-            <input type='url' name='file_link'>
-            <button type='submit'>Update</button>
-            <div class="timeout">
-                {% if messages %}
-                    {% for message in messages %}
-                        <p {% if message.tags %} class="{{message.tags}}-msg" {% endif %}>{{message}}</p>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            <p>Get Timesheets</p>
-            <label>Start:<input type="date" name="start_date" required></label>
-            <label>Weeks:<input type="number" value="1" min="0" max="5" name="weeks" required></label>
-            <button type='submit' name="timesheet" value="True">Download</button>
-        </form>
-    </div>
+    <body>
+        <ul id="accordion">
+            <li>
+                <label for="checkin_endpoint">Checkin Endpoint<span>&#x3e;</span></label>
+                <input type="radio" name="accordion" id="checkin_endpoint" checked>
+                <div class="accordion-content">
+                    <body>The random link for today is:
+                        <span class="tooltip spoiler" onclick=copy("{{  random_pass  }}") style="cursor: pointer;">
+                            {{ random_pass }}
+                            <span class="tooltiptext" id="myTooltip">copy</span>
+                        </span>
+                    </body>
+                </div>
+            </li>
+            <li>
+                <label for="schedule">Schedule<span>&#x3e;</span></label>
+                <input type="radio" name="accordion" id="schedule">
+                <form method="POST" class="accordion-content">
+                    {% csrf_token %}
+                    <p>Schedule Update</p>
+                    <input type='url' name='file_link'>
+                    <button type='submit'>Update</button>
+                    <div class="timeout">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <p {% if message.tags %} class="{{message.tags}}-msg" {% endif %}>{{message}}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </form>
+            </li>
+            <li>
+                <label for="timesheet">Timesheet<span>&#x3e;</span></label>
+                <input type="radio" name="accordion" id="timesheet">
+                <form method="POST" class="accordion-content">
+                    <p>Get Timesheets</p>
+                    <label>Start:<input type="date" name="start_date" required></label>
+                    <label>Weeks:<input type="number" value="1" min="0" max="5" name="weeks" required></label>
+                    <button type='submit' name="timesheet" value="True">Download</button>
+                </form>
+            </li>
+        </ul> 
+    </body>
 </html>
