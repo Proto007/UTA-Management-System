@@ -10,8 +10,8 @@ $(document).ready(function(){
         }
     })
     setTimeout(function() {
-        $(".timeout").fadeOut('fast');
-    }, 3500);
+        $(".timeout").alert('close');
+    }, 2500);
 })
 
 $(document).bind("contextmenu",function(e) {
@@ -23,10 +23,3 @@ $(document).keydown(function(e){
         return false;
     }
 });
-
-function copy(code) {
-    navigator.clipboard.writeText(code);
-    const tooltip = document.getElementById("myTooltip");
-    tooltip.innerHTML = "copied";
-    tooltip.style.color="green";
-}
