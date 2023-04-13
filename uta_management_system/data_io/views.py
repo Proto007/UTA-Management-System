@@ -269,7 +269,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
             uta = UTA.objects.get(emplid=empl)
         except UTA.DoesNotExist:
             return Response(
-                {"failure": "you're not a UTA"}, status=status.HTTP_404_NOT_FOUND
+                {"failure": "You're not a UTA"}, status=status.HTTP_404_NOT_FOUND
             )
         # get the current shift (pass `alternate_day` which can be empty)
         shift = self.get_current_shift(request.data["alternate_day"])
