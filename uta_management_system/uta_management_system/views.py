@@ -47,6 +47,12 @@ class Checkin(APIView):
             return render(request, "homepage.html")
         # check if the post request has a `fullname` field
         absent_uta = request.POST.get("fullname", None)
+        
+        # use 0 if the number_of_shifts field is left blank
+        additional_shifts = request.POST.get("number_of_shifts", None)
+        if not additional_shifts:
+            additional_shifts = 0
+
         # if request contains `fullname` field, make post request to `dataio` app's `checkin` model
         # the post request is being made for a UTA who is getting covered by another UTA
         if absent_uta:
@@ -54,7 +60,7 @@ class Checkin(APIView):
                 request.build_absolute_uri(reverse("dataio:checkin-list")),
                 json={
                     "emplid": UTA.objects.get(fullname=absent_uta).emplid,
-                    "number_of_shifts": request.data["number_of_shifts"],
+                    "number_of_shifts": int(additional_shifts),
                     "alternate_day": request.data["alternate_day"],
                     "covered_by": request.data["covered_by"],
                 },
@@ -65,7 +71,7 @@ class Checkin(APIView):
                 request.build_absolute_uri(reverse("dataio:checkin-list")),
                 json={
                     "emplid": request.data["emplid"],
-                    "number_of_shifts": request.data["number_of_shifts"],
+                    "number_of_shifts": int(additional_shifts),
                     "alternate_day": request.data["alternate_day"],
                 },
             )
@@ -80,7 +86,7 @@ class Checkin(APIView):
                 {
                     "on_shift": on_shift,
                     "covering": request.data["emplid"],
-                    "shift_num": request.data["number_of_shifts"],
+                    "shift_num": int(additional_shifts),
                     "alt_day": request.data["alternate_day"],
                 },
             )
