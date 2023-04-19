@@ -321,7 +321,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
             new_checkin = None
             # try to find a checkin object that was created today within all the checkins by this uta for current shift
             for c in uta_checkins:
-                if c.date == datetime.today().date:
+                if c.created_at.date() == datetime.today().date():
                     new_checkin = c
                     break
             if not new_checkin:
@@ -347,7 +347,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
                 next_shift_checkin = None
                 # try to find a checkin object that was created today within all the checkins by this uta for current shift
                 for c in uta_checkins:
-                    if c.date == datetime.today().date:
+                    if c.date() == datetime.today().date():
                         next_shift_checkin = c
                         break
                 if not next_shift_checkin:
