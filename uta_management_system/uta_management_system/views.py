@@ -56,12 +56,16 @@ class Checkin(APIView):
         # if request contains `fullname` field, make post request to `dataio` app's `checkin` model
         # the post request is being made for a UTA who is getting covered by another UTA
         if absent_uta:
+            alt_day = request.POST.get("alternate_day", None)
+            if not alt_day:
+                alt_day = ""
+
             response = requests.post(
                 request.build_absolute_uri(reverse("dataio:checkin-list")),
                 json={
                     "emplid": UTA.objects.get(fullname=absent_uta).emplid,
                     "number_of_shifts": int(additional_shifts),
-                    "alternate_day": request.data["alternate_day"],
+                    "alternate_day": alt_day,
                     "covered_by": request.data["covered_by"],
                 },
             )
@@ -94,6 +98,7 @@ class Checkin(APIView):
         if response.status_code == 201:
             messages.success(request, response.json()["message"])
         else:
+            print(response.json().keys())
             messages.error(request, response.json()["failure"])
         # redirect to the current endpoint (shows messages)
         return HttpResponseRedirect(self.request.path_info)
