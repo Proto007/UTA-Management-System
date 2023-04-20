@@ -9,6 +9,7 @@ from zipfile import ZipFile
 import pandas as pd
 import pytz
 from django.http import HttpResponse
+from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -321,9 +322,13 @@ class CheckinViewSet(viewsets.ModelViewSet):
             new_checkin = None
             # try to find a checkin object that was created today within all the checkins by this uta for current shift
             for c in uta_checkins:
-                if c.created_at.date() == datetime.today().date():
+                if c.created_at.date() == timezone.now().date():
                     new_checkin = c
-                    break
+                    # return response indicating that the user is already checked in
+                    return Response(
+                        {"message": f"You're already checked in for current shift"},
+                        status=status.HTTP_201_CREATED,
+                    )
             if not new_checkin:
                 raise Checkin.DoesNotExist
         except Checkin.DoesNotExist:
@@ -347,9 +352,15 @@ class CheckinViewSet(viewsets.ModelViewSet):
                 next_shift_checkin = None
                 # try to find a checkin object that was created today within all the checkins by this uta for current shift
                 for c in uta_checkins:
-                    if c.date() == datetime.today().date():
+                    if c.created_at.date() == timezone.now().date():
                         next_shift_checkin = c
-                        break
+                        # return response indicating that the user is already checked in
+                        return Response(
+                            {
+                                "message": f"You're already checked in for additional shift(s)"
+                            },
+                            status=status.HTTP_201_CREATED,
+                        )
                 if not next_shift_checkin:
                     raise Checkin.DoesNotExist
             except Checkin.DoesNotExist:
