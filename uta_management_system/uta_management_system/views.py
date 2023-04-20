@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 
+import pytz
 import requests
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
@@ -9,6 +10,7 @@ from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.views import APIView
 
 from data_io.models import UTA
+from data_io.models import Checkin as CheckinModel
 
 
 def homepage(request):
@@ -31,9 +33,31 @@ class Checkin(APIView):
         new_pass = requests.post(
             request.build_absolute_uri(reverse("dataio:random_pass-list")), json={}
         ).json()["random_pass"]
+        # get all the Checkin events for the current day
+        today_min = datetime.combine(
+            date.today(), time.min, tzinfo=pytz.timezone("US/Eastern")
+        )
+        today_max = datetime.combine(
+            date.today(), time.max, tzinfo=pytz.timezone("US/Eastern")
+        )
+        checkin_info = CheckinModel.objects.filter(
+            created_at__range=(today_min, today_max)
+        )
+        # get the information about UTAs who checked in on current day
+        checked_in = [
+            {
+                "name": UTA.objects.get(emplid=c.emplid).fullname,
+                "shift": c.shift,
+                "is_late": (c.late_mins >= 10),
+                "late_mins": c.late_mins,
+                "alternate_day": c.alternate_day,
+                "covered_by": c.covered_by,
+            }
+            for c in checkin_info
+        ]
         # render `checkin.html` page if the endpoint matches the `random_pass`
         if random_pass == new_pass:
-            return render(request, "checkin.html")
+            return render(request, "checkin.html", {"checked_in": checked_in})
         # render `homepage.html` if the endpoint is invalid
         return render(request, "homepage.html")
 
@@ -47,7 +71,7 @@ class Checkin(APIView):
             return render(request, "homepage.html")
         # check if the post request has a `fullname` field
         absent_uta = request.POST.get("fullname", None)
-        
+
         # use 0 if the number_of_shifts field is left blank
         additional_shifts = request.POST.get("number_of_shifts", None)
         if not additional_shifts:
