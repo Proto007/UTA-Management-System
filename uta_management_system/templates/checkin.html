@@ -13,7 +13,7 @@
                 background-color: #4e2e91;
                 border-color: #ffffff;
             }
-            .list-group{
+            .accordion{
                 max-height: 25vh;
                 overflow:scroll;
                 overflow-x: hidden;
@@ -127,9 +127,23 @@
                     <div class="card-header text-center text-white" style="background-color:#4e2e91;">
                         Recent
                     </div>
-                    <div class="list-group text-center rounded-0">
+                    <div class="accordion text-center rounded-0" id="recentAccordion">
                         {% for c in checked_in %}
-                            <button type="button" class="list-group-item btn {% if c.is_late %}btn-outline-danger{% else %}btn-outline-success{% endif %} rounded-0">{{ c.name }}</button>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading{{c.pk_id}}">
+                                <button class="accordion-button btn {% if c.is_late %}btn-outline-danger{% else %}btn-outline-success{% endif %} shadow-none collapsed rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{c.pk_id}}" aria-expanded="true" aria-controls="collapse{{c.pk_id}}">
+                                    {{ c.name }}
+                                </button>
+                                </h2>
+                                <div id="collapse{{c.pk_id}}" class="accordion-collapse collapse" aria-labelledby="heading{{c.pk_id}}" data-bs-parent="#recentAccordion">
+                                <div class="accordion-body text-start">
+                                    <p>Shift: {{c.shift}}</p>
+                                    <p>Late Mins: {{c.late_mins}} mins</p>
+                                    <p>Alternate Day: {{c.alternate_day}}</p>
+                                    <p>Covered By: {{c.covered_by}}</p>
+                                </div>
+                                </div>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>

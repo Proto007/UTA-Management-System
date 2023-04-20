@@ -52,6 +52,7 @@ class Checkin(APIView):
                 "late_mins": c.late_mins,
                 "alternate_day": c.alternate_day,
                 "covered_by": c.covered_by,
+                "pk_id": f"{c.pk}"
             }
             for c in checkin_info
         ]
