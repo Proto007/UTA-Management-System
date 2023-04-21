@@ -19,6 +19,11 @@
                 overflow-x: hidden;
                 -webkit-overflow-scrolling: touch;
             }
+            button::after {
+                position: absolute;
+                z-index: 100;
+                right: 16px;
+            }
         </style>
     </head>
     <div class="container justify-content-center mt-5">
@@ -99,13 +104,13 @@
                             </div>
                             {% if messages %}
                                 {% for message in messages %}
-                                    <p {% if message.tags == "error" %} 
-                                            class="timeout text-danger fade show" 
+                                    <div {% if message.tags == "error" %} 
+                                            class="timeout alert alert-danger fade show text-center" 
                                         {% else %}
-                                            class="timeout text-success fade show"
+                                            class="timeout alert alert-success fade show text-center"
                                         {% endif %} >
                                         {{ message }}
-                                    </p>
+                                    </div>
                                 {% endfor %}
                             {% endif %}
                             {% if on_shift %}
@@ -127,25 +132,33 @@
                     <div class="card-header text-center text-white" style="background-color:#4e2e91;">
                         Recent
                     </div>
-                    <div class="accordion text-center rounded-0" id="recentAccordion">
-                        {% for c in checked_in %}
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading{{c.pk_id}}">
-                                <button class="accordion-button btn {% if c.is_late %}btn-outline-danger{% else %}btn-outline-success{% endif %} shadow-none collapsed rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{c.pk_id}}" aria-expanded="true" aria-controls="collapse{{c.pk_id}}">
-                                    {{ c.name }}
-                                </button>
-                                </h2>
-                                <div id="collapse{{c.pk_id}}" class="accordion-collapse collapse" aria-labelledby="heading{{c.pk_id}}" data-bs-parent="#recentAccordion">
-                                <div class="accordion-body text-start">
-                                    <p>Shift: {{c.shift}}</p>
-                                    <p>Late Mins: {{c.late_mins}} mins</p>
-                                    <p>Alternate Day: {{c.alternate_day}}</p>
-                                    <p>Covered By: {{c.covered_by}}</p>
+                    {% if checked_in %}
+                        <div class="accordion rounded-0" id="recentAccordion">
+                            {% for c in checked_in %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading{{c.pk_id}}">
+                                        <button class="accordion-button shadow-none collapsed rounded-0 d-block text-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{c.pk_id}}" aria-expanded="true" aria-controls="collapse{{c.pk_id}}">
+                                            {{ c.name }}
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{c.pk_id}}" class="accordion-collapse collapse" aria-labelledby="heading{{c.pk_id}}" data-bs-parent="#recentAccordion">
+                                        <dl class="row accordion-body pb-0">
+                                            <dt class="col-sm-6">Shift</dt> 
+                                            <dd class="col-sm-6">{{c.shift}}</dd><hr class="mt-1 mb-1"/>
+                                            <dt class="col-sm-6">Late</dt> 
+                                            <dd class="col-sm-6 {% if c.is_late %}text-danger{% else %}text-success{% endif %}">{{c.late_mins}} mins</dd><hr class="mt-1 mb-1"/>
+                                            <dt class="col-sm-6">Alternate Day</dt>
+                                            <dd class="col-sm-6">{{c.alternate_day}}</dd><hr class="mt-1 mb-1"/>
+                                            <dt class="col-sm-6">Covered By</dt>
+                                            <dd class="col-sm-6">{{c.covered_by}}</dd>
+                                        </dl>
+                                    </div>
                                 </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                            <div class="card p-4 text-center text-muted">No Checkins Today</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
