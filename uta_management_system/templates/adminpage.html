@@ -22,45 +22,51 @@
             </p>
         {% endfor %}
     {% endif %}
-    <div class="container text-center mt-5">
+    <div class="container text-center">
         <div class="row">
-            <div class="col">
-                <div class="card rounded-0 shadow-lg bg-body" id="checkin-endpoint-actions">
-                    <div class="card-header">Today's Link</div>
-                    <div class="card-body">
-                        The random link for today is: 
-                        <a href="http://{{ request.get_host }}/{{ random_pass }}" target="_blank"> {{ random_pass }}</a>
-                    </div>
+            <div class="col card rounded-0 shadow-lg bg-body p-0" id="checkin-endpoint-actions">
+                <div class="card-header rounded-0 text-white" style="background-color:#4e2e91;">Today's Link</div>
+                <div class="card-body">
+                    <a href="http://{{ request.get_host }}/{{ random_pass }}" target="_blank"> {{ random_pass }}</a>
                 </div>
             </div>
-            <div class="col">
-                <div class="card rounded-0 shadow-lg bg-body" id="schedule-actions">
-                    <div class="card-header">Update Schedule</div>
-                    <div class="card-body">
-                        <form method="POST" class="input-group d-flex justify-content-center">
-                            <input type='url' name='file_link'>
-                            <button class="btn btn-dark rounded-0" type='submit'>Update</button>
-                        </form>
-                    </div>
+            <div class="col card rounded-0 justify-content-center p-0 shadow-lg">
+                Information about the link and how that works.
+            </div>
+        </div>
+        <div class="row">
+            <div class="col card rounded-0 shadow-lg bg-body p-0" id="schedule-actions">
+                <div class="card-header rounded-0 text-white" style="background-color:#4e2e91;">Update Schedule</div>
+                <div class="card-body">
+                    <form method="POST" class="input-group d-flex justify-content-center">
+                        <input type='url' name='file_link'>
+                        <button class="btn rounded-0 text-white" type='submit' style="background-color: #4e2e91;">Update</button>
+                    </form>
                 </div>
             </div>
-            <div class="col">
-                <div class="card rounded-0 shadow-lg bg-body" id="timesheet-actions">
-                    <div class="card-header">Timesheets</div>
-                    <div class="card-body">
-                        <form method="POST">
-                            <div class="input-group mb-3">
-                                <div class="border border-dark input-group-prepend"> <span class="input-group-text text-bg-dark rounded-0">Start</span></div>
-                                <input class="border border-dark form-control rounded-0" type="date" name="start_date" required>
-                            </div>
-                            <div class="input-group mb-3">
-                                <div class="border border-dark input-group-prepend"> <span class="input-group-text text-bg-dark rounded-0">Weeks</span></div>
-                                <input class="border border-dark form-control rounded-0" type="number" value="1" min="0" max="5" name="weeks" required>
-                            </div>
-                            <button class="btn btn-outline-dark rounded-0" type='submit' name="timesheet" value="True">Download</button>
-                        </form>
-                    </div>
+            <div class="col card rounded-0 justify-content-center p-0 shadow-lg">
+                Information about the schedule and the template.
+            </div>
+        </div>
+        <div class="row">
+            <div class="col card rounded-0 shadow-lg bg-body p-0" id="timesheet-actions">
+                <div class="card-header rounded-0 text-white" style="background-color:#4e2e91;">Timesheets</div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="input-group mb-3">
+                            <div class="border border-dark input-group-prepend"> <span class="input-group-text rounded-0 text-white" style="background-color:#4e2e91;">Start</span></div>
+                            <input class="border border-dark form-control rounded-0" type="date" name="start_date" required>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="border border-dark input-group-prepend"> <span class="input-group-text rounded-0 text-white" style="background-color:#4e2e91;">Weeks</span></div>
+                            <input class="border border-dark form-control rounded-0" type="number" value="1" min="0" max="5" name="weeks" required>
+                        </div>
+                        <button class="btn rounded-0 text-white" type='submit' name="timesheet" value="True" style="background-color:#4e2e91;">Download</button>
+                    </form>
                 </div>
+            </div>
+            <div class="col card rounded-0 justify-content-center p-0 shadow-lg">
+                Information about the timesheets.
             </div>
         </div>
     </div>
