@@ -14,59 +14,65 @@
     {% if messages %}
         {% for message in messages %}
             <p {% if message.tags == "error" %} 
-                    class="timeout alert alert-danger fade show rounded-0" 
+                    class="timeout alert alert-danger fade show rounded-0 position-absolute w-100" 
                 {% else %}
-                    class="timeout alert alert-{{message.tags}} fade show rounded-0"
+                    class="timeout alert alert-{{message.tags}} fade show rounded-0 position-absolute w-100"
                 {% endif %} >
                 {{ message }}
             </p>
         {% endfor %}
     {% endif %}
-    <div class="container text-center">
+    <div class="container text-center justify-content-center mt-5 mb-5 shadow-lg">
+        <div class="row card rounded-0 bg-body" style="border-color:#4e2e91;">
+            <div class="card-header rounded-0 text-warning fs-3 fw-bold" style="background-color:#4e2e91;">Admin Operations</div>
+            <div class="card-body">
+                This link should not be shared with any UTA. It should be private and only used by the admin responsible for the admin operations.
+            </div>
+        </div>
         <div class="row">
-            <div class="col card rounded-0 shadow-lg bg-body p-0" id="checkin-endpoint-actions">
-                <div class="card-header rounded-0 text-white" style="background-color:#4e2e91;">Today's Link</div>
+            <div class="col-md-4 card rounded-0 bg-body p-0" id="checkin-endpoint-actions" style="border-color:#4e2e91;">
+                <div class="card-header rounded-0 text-white fw-bold" style="background-color:#4e2e91;">Today's Link</div>
                 <div class="card-body">
                     <a href="http://{{ request.get_host }}/{{ random_pass }}" target="_blank"> {{ random_pass }}</a>
                 </div>
             </div>
-            <div class="col card rounded-0 justify-content-center p-0 shadow-lg">
-                Information about the link and how that works.
+            <div class="col card rounded-0 justify-content-center p-3 text-black border-top-0 border-start-0" style="border-color:#4e2e91;">
+                <div>This link changes each day. Share this link only with the UTA or person setting up the login at the beginning of each day. This should not be shared with all UTAs as that will allow them to login from outside the building</div>
             </div>
         </div>
         <div class="row">
-            <div class="col card rounded-0 shadow-lg bg-body p-0" id="schedule-actions">
-                <div class="card-header rounded-0 text-white" style="background-color:#4e2e91;">Update Schedule</div>
+            <div class="col-md-4 card rounded-0 bg-body p-0" id="schedule-actions" style="border-color:#4e2e91;">
+                <div class="card-header rounded-0 text-white fw-bold" style="background-color:#4e2e91;">Update Schedule</div>
                 <div class="card-body">
                     <form method="POST" class="input-group d-flex justify-content-center">
                         <input type='url' name='file_link'>
-                        <button class="btn rounded-0 text-white" type='submit' style="background-color: #4e2e91;">Update</button>
+                        <button class="btn rounded-0 text-white fw-bold" type='submit' style="background-color: #4e2e91;">Update</button>
                     </form>
                 </div>
             </div>
-            <div class="col card rounded-0 justify-content-center p-0 shadow-lg">
-                Information about the schedule and the template.
+            <div class="col card rounded-0 justify-content-center p-3 text-black border-top-0 border-start-0" style="border-color:#4e2e91;">
+                <p>Updating the link will get rid of old information from the database but keep the checkins for timesheet. This field expects a Google Sheets link. Make sure to click on "Share" and copy the link with "Copy link". The document must be accessible with the link to anyone. The column names must be formatted appropriately. <a class="in-line" target="_blank" href="https://docs.google.com/spreadsheets/d/1-fm1C8ltwPC8XTCMGzqvDvfjpryteVoE8tw0JZyzW6o/edit?usp=sharing">Here is a template file link that can be used.</a> Feel free to make a copy of this and modify.</p>
             </div>
         </div>
         <div class="row">
-            <div class="col card rounded-0 shadow-lg bg-body p-0" id="timesheet-actions">
-                <div class="card-header rounded-0 text-white" style="background-color:#4e2e91;">Timesheets</div>
+            <div class="col-md-4 card rounded-0 bg-body p-0" id="timesheet-actions" style="border-color:#4e2e91;">
+                <div class="card-header rounded-0 text-white fw-bold" style="background-color:#4e2e91;">Timesheets</div>
                 <div class="card-body">
                     <form method="POST">
                         <div class="input-group mb-3">
-                            <div class="border border-dark input-group-prepend"> <span class="input-group-text rounded-0 text-white" style="background-color:#4e2e91;">Start</span></div>
+                            <div class="border border-dark input-group-prepend"> <span class="input-group-text rounded-0 text-white fw-bold" style="background-color:#4e2e91;">Start</span></div>
                             <input class="border border-dark form-control rounded-0" type="date" name="start_date" required>
                         </div>
                         <div class="input-group mb-3">
-                            <div class="border border-dark input-group-prepend"> <span class="input-group-text rounded-0 text-white" style="background-color:#4e2e91;">Weeks</span></div>
+                            <div class="border border-dark input-group-prepend"> <span class="input-group-text rounded-0 text-white fw-bold" style="background-color:#4e2e91;">Weeks</span></div>
                             <input class="border border-dark form-control rounded-0" type="number" value="1" min="0" max="5" name="weeks" required>
                         </div>
-                        <button class="btn rounded-0 text-white" type='submit' name="timesheet" value="True" style="background-color:#4e2e91;">Download</button>
+                        <button class="btn rounded-0 text-white fw-bold" type='submit' name="timesheet" value="True" style="background-color:#4e2e91;">Download</button>
                     </form>
                 </div>
             </div>
-            <div class="col card rounded-0 justify-content-center p-0 shadow-lg">
-                Information about the timesheets.
+            <div class="col card rounded-0 justify-content-center p-3 border-top-0 border-start-0" style="border-color:#4e2e91;">
+                The Start field should receive the data from which you want to get the timesheets. Weeks field represents how many weeks from the start date. A week ends on each Friday.
             </div>
         </div>
     </div>
