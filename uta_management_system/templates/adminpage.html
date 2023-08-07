@@ -14,10 +14,10 @@
     {% if messages %}
         {% for message in messages %}
             <p {% if message.tags == "error" %} 
-                    class="timeout alert alert-danger fade show rounded-0 position-absolute w-100" 
+                    class="timeout alert alert-danger fade show rounded-0 position-absolute w-100 top-0 start-0" 
                 {% else %}
-                    class="timeout alert alert-{{message.tags}} fade show rounded-0 position-absolute w-100"
-                {% endif %} >
+                    class="timeout alert alert-{{message.tags}} fade show rounded-0 position-absolute w-100 top-0 start-0"
+                {% endif %} style="z-index: 999;">
                 {{ message }}
             </p>
         {% endfor %}
@@ -25,8 +25,8 @@
     <div class="container text-center justify-content-center mt-5 mb-5 shadow-lg">
         <div class="row card rounded-0 bg-body" style="border-color:#4e2e91;">
             <div class="card-header rounded-0 text-warning fs-3 fw-bold" style="background-color:#4e2e91;">Admin Operations</div>
-            <div class="card-body">
-                This link should not be shared with any UTA. It should be private and only used by the admin responsible for the admin operations.
+            <div class="card-body text-uppercase text-danger fw-bold">
+                The link to this page should not be shared with any UTA. It should be private and only used by the admin responsible for the admin operations.
             </div>
         </div>
         <div class="row">
@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div class="col card rounded-0 justify-content-center p-3 text-black border-top-0 border-start-0" style="border-color:#4e2e91;">
-                <div>This link changes each day. Share this link only with the UTA or person setting up the login at the beginning of each day. This should not be shared with all UTAs as that will allow them to login from outside the building</div>
+                <div>This link changes each day. Share this link only with the UTA or person setting up the login at the beginning of each day. <div class="text-danger d-inline">This should not be shared with all UTAs as that will allow them to login from outside the building.</div></div>
             </div>
         </div>
         <div class="row">
@@ -51,7 +51,7 @@
                 </div>
             </div>
             <div class="col card rounded-0 justify-content-center p-3 text-black border-top-0 border-start-0" style="border-color:#4e2e91;">
-                <p>Updating the link will get rid of old information from the database but keep the checkins for timesheet. This field expects a Google Sheets link. Make sure to click on "Share" and copy the link with "Copy link". The document must be accessible with the link to anyone. The column names must be formatted appropriately. <a class="in-line" target="_blank" href="https://docs.google.com/spreadsheets/d/1-fm1C8ltwPC8XTCMGzqvDvfjpryteVoE8tw0JZyzW6o/edit?usp=sharing">Here is a template file link that can be used.</a> Feel free to make a copy of this and modify.</p>
+                <div><div class="text-danger d-inline">Updating the link will get rid of old information from the database but keep the old checkins for timesheet.</div> This field expects a Google Sheets link. Make sure to click on <div class="text-success d-inline">Share</div> and copy the link with <div class="text-success d-inline">Copy Link</div>. The document must be accessible with the link to anyone. The column names must be formatted appropriately. <a class="in-line" target="_blank" href="https://docs.google.com/spreadsheets/d/1-fm1C8ltwPC8XTCMGzqvDvfjpryteVoE8tw0JZyzW6o/edit?usp=sharing">Here is a template file that can be used.</a> Feel free to make a copy of this and modify with shift information.</div>
             </div>
         </div>
         <div class="row">
