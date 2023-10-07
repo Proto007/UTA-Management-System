@@ -202,11 +202,11 @@ class CheckinViewSet(viewsets.ModelViewSet):
         """
         # get the day of `shift`
         day = shift.day
-        # return empty list if `num` is less than or equal to 1
-        if num - 1 <= 0:
+        # return empty list if `num` is less than or equal to 0
+        if num <= 0:
             return []
         # get all the shifts from database that are on the same day as `shift`
-        shifts = list(Shift.objects.filter(day=(day,)))
+        shifts = list(Shift.objects.filter(day=day))
         # sort the retrieved shifts based on the start time
         shifts.sort(key=lambda x: x.start)
         # return empty list if no shifts are acquired from the database
@@ -215,12 +215,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
         # get the index of shift in the list of shifts retrieved from the database
         index = shifts.index(shift)
         # get `num` number of shifts starting from `index` in the retrieved list and append them to an empty list
-        result = []
-        for i in range(1, num + 1):
-            # return shifts obtained so far if adding num exceeds the length of the retrieved list
-            if index + i > len(shifts) - 1:
-                return result
-            result.append(shifts[index + i])
+        result = shifts[index+1:min(len(shifts),index+num+1)]
         # return the shifts list
         return result
 
@@ -286,7 +281,6 @@ class CheckinViewSet(viewsets.ModelViewSet):
             )
         # get the next shifts based on `num_of_shifts`
         next_shifts = self.get_next_shift(shift[0], int(num_of_shifts))
-
         # if the UTA is extremely late to their shift, return 403 response and prevent them from checking in
         # UTA is extremely late if they missed 1/3 of their shift
         if shift[1] > (
@@ -347,7 +341,7 @@ class CheckinViewSet(viewsets.ModelViewSet):
             # only checkin if it hasn't been done in today's date
             try:
                 uta_checkins = list(
-                    Checkin.objects.filter(emplid=empl, shift=shift[0].description)
+                    Checkin.objects.filter(emplid=empl, shift=s.description)
                 )
                 next_shift_checkin = None
                 # try to find a checkin object that was created today within all the checkins by this uta for current shift
